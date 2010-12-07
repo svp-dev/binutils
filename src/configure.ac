@@ -46,6 +46,7 @@ m4_pattern_allow([^AS_FOR_TARGET$])dnl
 AC_PROG_INSTALL
 ACX_PROG_LN
 AC_PROG_LN_S
+AC_PROG_MKDIR_P
 
 ### we might need to use some other shell than /bin/sh for running subshells
 ### If we are on Windows, search for the shell.  This will permit people
@@ -2403,7 +2404,7 @@ changequote(,)
     # For an installed makeinfo, we require it to be from texinfo 4.4 or
     # higher, else we use the "missing" dummy.
     if ${MAKEINFO} --version \
-       | egrep 'texinfo[^0-9]*([1-3][0-9]|4\.[4-9]|[5-9])' >/dev/null 2>&1; then
+       | egrep 'texinfo[^0-9]*([1-3][0-9]|4\.[4-9]|4\.[1-3][0-9]|[5-9])' >/dev/null 2>&1; then
       :
     else
       MAKEINFO="$MISSING makeinfo"
