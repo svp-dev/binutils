@@ -5612,6 +5612,7 @@ do_s_func (int end_p, const char *default_prefix)
     {
       char *name, *label;
       char delim1, delim2;
+      size_t n;
 
       if (current_name != NULL)
 	{
@@ -5628,14 +5629,14 @@ do_s_func (int end_p, const char *default_prefix)
       if (*input_line_pointer != ',')
 	{
 	  if (default_prefix)
-	    asprintf (&label, "%s%s", default_prefix, name);
+	    n = asprintf (&label, "%s%s", default_prefix, name);
 	  else
 	    {
 	      char leading_char = bfd_get_symbol_leading_char (stdoutput);
 	      /* Missing entry point, use function's name with the leading
 		 char prepended.  */
 	      if (leading_char)
-		asprintf (&label, "%c%s", leading_char, name);
+		n = asprintf (&label, "%c%s", leading_char, name);
 	      else
 		label = name;
 	    }

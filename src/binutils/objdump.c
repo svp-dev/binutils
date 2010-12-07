@@ -1130,12 +1130,13 @@ static void
 print_line (struct print_file_list *p, unsigned int line)
 {
   const char *l;
+  size_t n;
  
   --line; 
   if (line >= p->maxline)
     return;
   l = p->linemap [line];
-  fwrite (l, 1, strcspn (l, "\n\r"), stdout);
+  n = fwrite (l, 1, strcspn (l, "\n\r"), stdout);
   putchar ('\n');
 } 
 
