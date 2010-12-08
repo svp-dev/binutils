@@ -152,6 +152,7 @@ ALL_EMULATIONS = \
 	eelf32_dlx.o \
 	eelf32_i960.o \
 	eelf32_i860.o \
+	eelf32_mtsparc.o \
 	eelf32_sparc.o \
 	eelf32_sparc_vxworks.o \
 	eelf32b4300.o \
@@ -375,6 +376,7 @@ ALL_EMULATIONS = \
 	eshpe.o \
 	esparcaout.o \
 	esparclinux.o \
+	emtsparclinux.o \
 	esparcnbsd.o \
 	est2000.o \
 	esun3.o \
@@ -407,6 +409,7 @@ ALL_64_EMULATIONS = \
 	eelf_x86_64.o \
 	eelf_x86_64_fbsd.o \
 	eelf64_s390.o \
+	eelf64_mtsparc.o \
 	eelf64_sparc.o \
 	eelf64_sparc_fbsd.o \
 	eelf64alpha.o \
@@ -720,6 +723,9 @@ em32relf_linux.c: $(srcdir)/emulparams/m32relf_linux.sh \
 em32rlelf_linux.c: $(srcdir)/emulparams/m32rlelf_linux.sh \
   $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} m32rlelf_linux "$(tdir_m32rlelf_linux)"
+eelf32_mtsparc.c: $(srcdir)/emulparams/elf32_mtsparc.sh \
+  $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+	${GENSCRIPTS} elf32_mtsparc "$(tdir_elf32_mtsparc)"
 eelf32_sparc.c: $(srcdir)/emulparams/elf32_sparc.sh \
   $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} elf32_sparc "$(tdir_elf32_sparc)"
@@ -952,6 +958,9 @@ eelf64_ia64_fbsd.c: $(srcdir)/emulparams/elf64_ia64_fbsd.sh \
 eelf64_s390.c: $(srcdir)/emulparams/elf64_s390.sh \
   $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} elf64_s390 "$(tdir_elf64_s390)"
+eelf64_mtsparc.c: $(srcdir)/emulparams/elf64_mtsparc.sh \
+  $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+	${GENSCRIPTS} elf64_mtsparc "$(tdir_elf64_mtsparc)"
 eelf64_sparc.c: $(srcdir)/emulparams/elf64_sparc.sh \
   $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} elf64_sparc "$(tdir_elf64_sparc)"
@@ -1636,6 +1645,9 @@ eshpe.c: $(srcdir)/emulparams/shpe.sh \
 esparcaout.c: $(srcdir)/emulparams/sparcaout.sh \
   $(srcdir)/emultempl/generic.em $(srcdir)/scripttempl/aout.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} sparcaout "$(tdir_sparcaout)"
+emtsparclinux.c: $(srcdir)/emulparams/mtsparclinux.sh \
+  $(srcdir)/emultempl/linux.em $(srcdir)/scripttempl/aout.sc ${GEN_DEPENDS}
+	${GENSCRIPTS} mtsparclinux "$(tdir_mtsparclinux)"
 esparclinux.c: $(srcdir)/emulparams/sparclinux.sh \
   $(srcdir)/emultempl/linux.em $(srcdir)/scripttempl/aout.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} sparclinux "$(tdir_sparclinux)"
