@@ -337,6 +337,7 @@ ALL_EMULATIONS = \
 	emsp430x447.o \
 	emsp430x448.o \
 	emsp430x449.o \
+	emtalpha.o \
 	enews.o \
 	ens32knbsd.o \
 	eor32.o \
@@ -416,6 +417,7 @@ ALL_64_EMULATIONS = \
 	eelf64ltsmip.o \
 	eelf64hppa.o \
 	eelf64mmix.o \
+	eelf64mtalpha.o \
 	emmo.o \
 	eelf64ppc.o \
 	eelf64lppc.o \
@@ -929,6 +931,10 @@ eelf64hppa.c: $(srcdir)/emulparams/elf64hppa.sh \
   $(srcdir)/emulparams/hppa64linux.sh \
   $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} elf64hppa "$(tdir_elf64hppa)"
+eelf64mtalpha.c: $(srcdir)/emulparams/elf64mtalpha.sh \
+  $(ELF_DEPS) $(srcdir)/emultempl/mtalphaelf.em \
+  $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+	${GENSCRIPTS} elf64mtalpha "$(tdir_elf64mtalpha)"
 eelf64_aix.c: $(srcdir)/emulparams/elf64_aix.sh \
   $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} elf64_aix "$(tdir_elf64_aix)"
@@ -1475,6 +1481,9 @@ emsp430x449.c: $(srcdir)/emulparams/msp430all.sh \
   $(ELF_GEN_DEPS) $(srcdir)/scripttempl/elf32msp430.sc \
   ${GEN_DEPENDS}
 	${GENSCRIPTS} msp430x449 "$(tdir_msp430x449)" msp430all
+emtalpha.c: $(srcdir)/emulparams/mtalpha.sh \
+  $(srcdir)/emultempl/generic.em $(srcdir)/scripttempl/mtalpha.sc ${GEN_DEPENDS}
+	${GENSCRIPTS} mtalpha "$(tdir_mtalpha)"
 enews.c: $(srcdir)/emulparams/news.sh \
   $(srcdir)/emultempl/generic.em $(srcdir)/scripttempl/aout.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} news "$(tdir_news)"
