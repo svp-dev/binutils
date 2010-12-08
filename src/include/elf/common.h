@@ -256,6 +256,11 @@
 /* Microthread Alpha backend magic number.  Written in the absence of an ABI.  */
 #define EM_MTALPHA		0xafef
 
+/* Microthread Sparc backend magic number.  Written in the absence of an ABI.  */
+#define EM_MTSPARC	     0xaff0
+#define EM_MTSPARC32PLUS 0xaff1	/* Sun's "v8plus" */
+#define EM_MTSPARCV9     0xaff2
+
 /* Cygnus M32R ELF backend.  Written in the absence of an ABI.  */
 #define EM_CYGNUS_M32R		0x9041
 
