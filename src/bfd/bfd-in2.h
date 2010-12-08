@@ -1952,6 +1952,10 @@ enum bfd_architecture
 #define bfd_mach_arm_ep9312    11
 #define bfd_mach_arm_iWMMXt    12
 #define bfd_mach_arm_iWMMXt2   13
+  bfd_arch_mtalpha,   /* Microthreaded Dec Alpha */
+#define bfd_mach_mtalpha_ev4  0x10
+#define bfd_mach_mtalpha_ev5  0x20
+#define bfd_mach_mtalpha_ev6  0x30
   bfd_arch_ns32k,     /* National Semiconductors ns32000 */
   bfd_arch_w65,       /* WDC 65816 */
   bfd_arch_tic30,     /* Texas Instruments TMS320C30 */

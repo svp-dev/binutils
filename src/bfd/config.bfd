@@ -90,6 +90,7 @@ m68*)		 targ_archs=bfd_m68k_arch ;;
 m88*)		 targ_archs=bfd_m88k_arch ;;
 maxq*)		 targ_archs=bfd_maxq_arch ;;
 mips*)		 targ_archs=bfd_mips_arch ;;
+mtalpha*)	 targ_archs=bfd_mtalpha_arch ;;
 or32*)		 targ_archs=bfd_or32_arch ;;
 pdp11*)		 targ_archs=bfd_pdp11_arch ;;
 pj*)		 targ_archs="bfd_pj_arch bfd_i386_arch";;
@@ -989,6 +990,17 @@ case "${targ}" in
     targ_defvec=bfd_elf32_mt_vec
     ;;
 
+#ifdef BFD64
+  mtalpha*-*-linux-* | mtalpha*-*-elf*)
+    targ_defvec=bfd_elf64_mtalpha_vec
+    targ_selvecs=ecoffmtalpha_little_vec
+    want64=true
+    ;;
+  mtalpha*-*-*)
+    targ_defvec=ecoffmtalpha_little_vec
+    want64=true
+    ;;
+#endif
   msp430-*-*)
     targ_defvec=bfd_elf32_msp430_vec
     ;;

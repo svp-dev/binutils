@@ -281,6 +281,10 @@ DESCRIPTION
 .#define bfd_mach_arm_ep9312	11
 .#define bfd_mach_arm_iWMMXt	12
 .#define bfd_mach_arm_iWMMXt2	13
+.  bfd_arch_mtalpha,   {* Microthreaded Dec Alpha *}
+.#define bfd_mach_mtalpha_ev4  0x10
+.#define bfd_mach_mtalpha_ev5  0x20
+.#define bfd_mach_mtalpha_ev6  0x30
 .  bfd_arch_ns32k,     {* National Semiconductors ns32000 *}
 .  bfd_arch_w65,       {* WDC 65816 *}
 .  bfd_arch_tic30,     {* Texas Instruments TMS320C30 *}
@@ -473,6 +477,7 @@ extern const bfd_arch_info_type bfd_mn10200_arch;
 extern const bfd_arch_info_type bfd_mn10300_arch;
 extern const bfd_arch_info_type bfd_msp430_arch;
 extern const bfd_arch_info_type bfd_mt_arch;
+extern const bfd_arch_info_type bfd_mtalpha_arch;
 extern const bfd_arch_info_type bfd_ns32k_arch;
 extern const bfd_arch_info_type bfd_openrisc_arch;
 extern const bfd_arch_info_type bfd_or32_arch;
@@ -543,6 +548,7 @@ static const bfd_arch_info_type * const bfd_archures_list[] =
     &bfd_mn10200_arch,
     &bfd_mn10300_arch,
     &bfd_mt_arch,
+    &bfd_mtalpha_arch,
     &bfd_msp430_arch,
     &bfd_ns32k_arch,
     &bfd_openrisc_arch,

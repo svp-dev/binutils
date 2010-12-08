@@ -97,6 +97,7 @@ ALL_MACHINES = \
 	cpu-mips.lo \
 	cpu-mmix.lo \
 	cpu-mt.lo \
+	cpu-mtalpha.lo \
 	cpu-msp430.lo \
 	cpu-or32.lo \
 	cpu-ns32k.lo \
@@ -163,6 +164,7 @@ ALL_MACHINES_CFILES = \
 	cpu-mips.c \
 	cpu-mmix.c \
 	cpu-mt.c \
+	cpu-mtalpha.c \
 	cpu-msp430.c \
 	cpu-or32.c \
 	cpu-ns32k.c \
@@ -558,6 +560,7 @@ BFD64_BACKENDS = \
 	aix5ppc-core.lo \
 	aout64.lo \
 	coff-alpha.lo \
+	coff-mtalpha.lo \
 	coff64-rs6000.lo \
 	demo64.lo \
 	efi-app-ia64.lo \
@@ -571,6 +574,7 @@ BFD64_BACKENDS = \
 	elfn32-mips.lo \
 	elf64-mips.lo \
 	elf64-mmix.lo \
+	elf64-mtalpha.lo \
 	elf64-sh64.lo \
 	elf64-ppc.lo \
 	elf64-s390.lo \
@@ -578,6 +582,7 @@ BFD64_BACKENDS = \
 	elf64.lo \
 	mmo.lo \
 	nlm32-alpha.lo \
+	nlm32-mtalpha.lo \
 	nlm64.lo \
 	coff-x86_64.lo \
 	pe-x86_64.lo \
@@ -589,12 +594,14 @@ BFD64_BACKENDS_CFILES = \
 	aix5ppc-core.c \
 	aout64.c \
 	coff-alpha.c \
+	coff-mtalpha.c \
 	coff64-rs6000.c \
 	demo64.c \
 	efi-app-ia64.c \
 	efi-app-x86_64.c \
 	elf64-x86-64.c \
 	elf64-alpha.c \
+	elf64-mtalpha.c \
 	elf64-hppa.c \
 	elf64-gen.c \
 	elfn32-mips.c \
@@ -607,6 +614,7 @@ BFD64_BACKENDS_CFILES = \
 	elf64.c \
 	mmo.c \
 	nlm32-alpha.c \
+	nlm32-mtalpha.c \
 	nlm64.c \
 	coff-x86_64.c \
 	pe-x86_64.c \
@@ -1097,6 +1105,7 @@ cpu-mep.lo: cpu-mep.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h
 cpu-mips.lo: cpu-mips.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h
 cpu-mmix.lo: cpu-mmix.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h
 cpu-mt.lo: cpu-mt.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h
+cpu-mtalpha.lo: cpu-mtalpha.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h
 cpu-msp430.lo: cpu-msp430.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h
 cpu-or32.lo: cpu-or32.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h
 cpu-ns32k.lo: cpu-ns32k.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h \
@@ -1817,6 +1826,11 @@ coff-alpha.lo: coff-alpha.c $(INCDIR)/filenames.h $(INCDIR)/bfdlink.h \
   $(INCDIR)/coff/symconst.h $(INCDIR)/coff/ecoff.h $(INCDIR)/coff/alpha.h \
   $(INCDIR)/aout/ar.h libcoff.h libecoff.h coffswap.h \
   ecoffswap.h
+coff-mtalpha.lo: coff-mtalpha.c $(INCDIR)/filenames.h $(INCDIR)/bfdlink.h \
+  $(INCDIR)/hashtab.h $(INCDIR)/coff/internal.h $(INCDIR)/coff/sym.h \
+  $(INCDIR)/coff/symconst.h $(INCDIR)/coff/ecoff.h $(INCDIR)/coff/alpha.h \
+  $(INCDIR)/aout/ar.h libcoff.h libecoff.h coffswap.h \
+  ecoffswap.h
 coff64-rs6000.lo: coff64-rs6000.c $(INCDIR)/filenames.h \
   $(INCDIR)/bfdlink.h $(INCDIR)/hashtab.h $(INCDIR)/coff/internal.h \
   $(INCDIR)/coff/xcoff.h $(INCDIR)/coff/rs6k64.h libcoff.h \
@@ -1873,6 +1887,13 @@ elf64-mmix.lo: elf64-mmix.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(INCDIR)/elf/mmix.h \
   $(INCDIR)/elf/reloc-macros.h $(INCDIR)/opcode/mmix.h \
   elf64-target.h
+elf64-mtalpha.lo: elf64-mtalpha.c $(INCDIR)/filenames.h \
+  $(INCDIR)/hashtab.h elf-bfd.h $(INCDIR)/elf/common.h \
+  $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h \
+  $(INCDIR)/elf/alpha.h $(INCDIR)/elf/reloc-macros.h \
+  $(INCDIR)/coff/internal.h $(INCDIR)/coff/sym.h $(INCDIR)/coff/symconst.h \
+  $(INCDIR)/coff/ecoff.h $(INCDIR)/coff/alpha.h $(INCDIR)/aout/ar.h \
+  libcoff.h libecoff.h ecoffswap.h elf64-target.h
 elf64-ppc.lo: elf64-ppc.c $(INCDIR)/filenames.h $(INCDIR)/bfdlink.h \
   $(INCDIR)/hashtab.h elf-bfd.h $(INCDIR)/elf/common.h \
   $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h $(INCDIR)/elf/ppc64.h \
@@ -1897,6 +1918,10 @@ mmo.lo: mmo.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h \
   $(INCDIR)/libiberty.h $(INCDIR)/elf/mmix.h $(INCDIR)/elf/reloc-macros.h \
   $(INCDIR)/opcode/mmix.h
 nlm32-alpha.lo: nlm32-alpha.c $(INCDIR)/filenames.h \
+  $(INCDIR)/hashtab.h $(INCDIR)/nlm/alpha-ext.h libnlm.h \
+  $(INCDIR)/nlm/common.h $(INCDIR)/nlm/internal.h $(INCDIR)/nlm/external.h \
+  nlmswap.h nlm-target.h
+nlm32-mtalpha.lo: nlm32-mtalpha.c $(INCDIR)/filenames.h \
   $(INCDIR)/hashtab.h $(INCDIR)/nlm/alpha-ext.h libnlm.h \
   $(INCDIR)/nlm/common.h $(INCDIR)/nlm/internal.h $(INCDIR)/nlm/external.h \
   nlmswap.h nlm-target.h
