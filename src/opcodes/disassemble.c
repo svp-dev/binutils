@@ -60,6 +60,7 @@
 #define ARCH_mn10200
 #define ARCH_mn10300
 #define ARCH_mt
+#define ARCH_mtalpha
 #define ARCH_msp430
 #define ARCH_ns32k
 #define ARCH_openrisc
@@ -254,6 +255,11 @@ disassembler (abfd)
 #ifdef ARCH_mt
     case bfd_arch_mt:
       disassemble = print_insn_mt;
+      break;
+#endif
+#ifdef ARCH_mtalpha
+    case bfd_arch_mtalpha:
+      disassemble = print_insn_mtalpha;
       break;
 #endif
 #ifdef ARCH_msp430
