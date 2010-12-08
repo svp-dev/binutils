@@ -797,6 +797,8 @@ extern bfd_boolean bfd_m68klinux_size_dynamic_sections
   (bfd *, struct bfd_link_info *);
 extern bfd_boolean bfd_sparclinux_size_dynamic_sections
   (bfd *, struct bfd_link_info *);
+extern bfd_boolean bfd_mtsparclinux_size_dynamic_sections
+  (bfd *, struct bfd_link_info *);
 
 /* mmap hacks */
 
@@ -1792,6 +1794,9 @@ enum bfd_architecture
 #define bfd_mach_i960_hx        8
 
   bfd_arch_or32,      /* OpenRISC 32 */
+
+  bfd_arch_mtsparc,   /* Microthread SPARC */
+#define bfd_mach_mtsparc               1
 
   bfd_arch_sparc,     /* SPARC */
 #define bfd_mach_sparc                 1

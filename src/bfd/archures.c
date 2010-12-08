@@ -122,6 +122,9 @@ DESCRIPTION
 .
 .  bfd_arch_or32,      {* OpenRISC 32 *}
 .
+.  bfd_arch_mtsparc,   {* Microthread SPARC *}
+.#define bfd_mach_mtsparc		1
+.
 .  bfd_arch_sparc,     {* SPARC *}
 .#define bfd_mach_sparc			1
 .{* The difference between v8plus and v9 is that v9 is a true 64 bit env.  *}
@@ -478,6 +481,7 @@ extern const bfd_arch_info_type bfd_mn10300_arch;
 extern const bfd_arch_info_type bfd_msp430_arch;
 extern const bfd_arch_info_type bfd_mt_arch;
 extern const bfd_arch_info_type bfd_mtalpha_arch;
+extern const bfd_arch_info_type bfd_mtsparc_arch;
 extern const bfd_arch_info_type bfd_ns32k_arch;
 extern const bfd_arch_info_type bfd_openrisc_arch;
 extern const bfd_arch_info_type bfd_or32_arch;
@@ -549,6 +553,7 @@ static const bfd_arch_info_type * const bfd_archures_list[] =
     &bfd_mn10300_arch,
     &bfd_mt_arch,
     &bfd_mtalpha_arch,
+    &bfd_mtsparc_arch,
     &bfd_msp430_arch,
     &bfd_ns32k_arch,
     &bfd_openrisc_arch,

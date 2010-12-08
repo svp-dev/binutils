@@ -790,6 +790,8 @@ extern bfd_boolean bfd_m68klinux_size_dynamic_sections
   (bfd *, struct bfd_link_info *);
 extern bfd_boolean bfd_sparclinux_size_dynamic_sections
   (bfd *, struct bfd_link_info *);
+extern bfd_boolean bfd_mtsparclinux_size_dynamic_sections
+  (bfd *, struct bfd_link_info *);
 
 /* mmap hacks */
 

@@ -97,6 +97,7 @@ ALL_MACHINES = \
 	cpu-mips.lo \
 	cpu-mmix.lo \
 	cpu-mt.lo \
+	cpu-mtsparc.lo \
 	cpu-mtalpha.lo \
 	cpu-msp430.lo \
 	cpu-or32.lo \
@@ -164,6 +165,7 @@ ALL_MACHINES_CFILES = \
 	cpu-mips.c \
 	cpu-mmix.c \
 	cpu-mt.c \
+	cpu-mtsparc.c \
 	cpu-mtalpha.c \
 	cpu-msp430.c \
 	cpu-or32.c \
@@ -278,6 +280,7 @@ BFD32_BACKENDS = \
 	elfxx-mips.lo \
 	elf32-mips.lo \
 	elf32-mt.lo \
+	elf32-mtsparc.lo \
 	elf32-msp430.lo \
 	elf32-openrisc.lo \
 	elf32-or32.lo \
@@ -290,6 +293,7 @@ BFD32_BACKENDS = \
 	elf32-sh64.lo \
 	elf32-sh64-com.lo \
 	elfxx-sparc.lo \
+	elfxx-mtsparc.lo \
 	elf32-sparc.lo \
 	elf32-spu.lo \
 	elf32-v850.lo \
@@ -326,6 +330,7 @@ BFD32_BACKENDS = \
 	m88kopenbsd.lo \
 	mach-o.lo \
 	mipsbsd.lo \
+	mtsparclinux.lo \
 	newsos3.lo \
 	nlm.lo \
 	nlm32-i386.lo \
@@ -457,6 +462,7 @@ BFD32_BACKENDS_CFILES = \
 	elfxx-mips.c \
 	elf32-mips.c \
 	elf32-mt.c \
+	elf32-mtsparc.c \
 	elf32-msp430.c \
 	elf32-openrisc.c \
 	elf32-or32.c \
@@ -469,6 +475,7 @@ BFD32_BACKENDS_CFILES = \
 	elf32-sh.c \
 	elf32-sh-symbian.c \
 	elfxx-sparc.c \
+	elfxx-mtsparc.c \
 	elf32-sparc.c \
 	elf32-spu.c \
 	elf32-v850.c \
@@ -505,6 +512,7 @@ BFD32_BACKENDS_CFILES = \
 	m88kopenbsd.c \
 	mach-o.c \
 	mipsbsd.c \
+	mtsparclinux.c \
 	newsos3.c \
 	nlm.c \
 	nlm32-i386.c \
@@ -579,6 +587,7 @@ BFD64_BACKENDS = \
 	elf64-ppc.lo \
 	elf64-s390.lo \
 	elf64-sparc.lo \
+	elf64-mtsparc.lo \
 	elf64.lo \
 	mmo.lo \
 	nlm32-alpha.lo \
@@ -610,6 +619,7 @@ BFD64_BACKENDS_CFILES = \
 	elf64-ppc.c \
 	elf64-s390.c \
 	elf64-sh64.c \
+	elf64-mtsparc.c \
 	elf64-sparc.c \
 	elf64.c \
 	mmo.c \
@@ -1477,6 +1487,11 @@ elf32-msp430.lo: elf32-msp430.c $(INCDIR)/filenames.h \
   $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h \
   $(INCDIR)/bfdlink.h $(INCDIR)/elf/msp430.h $(INCDIR)/elf/reloc-macros.h \
   elf32-target.h
+elf32-mtsparc.lo: elf32-mtsparc.c $(INCDIR)/filenames.h \
+  $(INCDIR)/bfdlink.h $(INCDIR)/hashtab.h elf-bfd.h $(INCDIR)/elf/common.h \
+  $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h $(INCDIR)/elf/sparc.h \
+  $(INCDIR)/elf/reloc-macros.h $(INCDIR)/opcode/mtsparc.h \
+  elfxx-mtsparc.h elf-vxworks.h elf32-target.h
 elf32-openrisc.lo: elf32-openrisc.c $(INCDIR)/filenames.h \
   $(INCDIR)/hashtab.h elf-bfd.h $(INCDIR)/elf/common.h \
   $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h \
@@ -1527,6 +1542,11 @@ elf32-sh-symbian.lo: elf32-sh-symbian.c elf32-sh.c \
   $(INCDIR)/elf/external.h elf-vxworks.h $(INCDIR)/elf/sh.h \
   $(INCDIR)/elf/reloc-macros.h $(INCDIR)/libiberty.h \
   $(srcdir)/../opcodes/sh-opc.h elf32-sh-relocs.h elf32-target.h
+elfxx-mtsparc.lo: elfxx-mtsparc.c $(INCDIR)/filenames.h \
+  $(INCDIR)/bfdlink.h $(INCDIR)/hashtab.h $(INCDIR)/libiberty.h \
+  elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
+  $(INCDIR)/elf/external.h $(INCDIR)/elf/sparc.h $(INCDIR)/elf/reloc-macros.h \
+  $(INCDIR)/opcode/sparc.h elfxx-mtsparc.h elf-vxworks.h
 elfxx-sparc.lo: elfxx-sparc.c $(INCDIR)/filenames.h \
   $(INCDIR)/bfdlink.h $(INCDIR)/hashtab.h $(INCDIR)/libiberty.h \
   elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
@@ -1664,6 +1684,9 @@ mach-o.lo: mach-o.c $(INCDIR)/filenames.h mach-o.h \
 mipsbsd.lo: mipsbsd.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h \
   libaout.h $(INCDIR)/bfdlink.h aout-target.h $(INCDIR)/aout/aout64.h \
   $(INCDIR)/aout/stab_gnu.h $(INCDIR)/aout/stab.def $(INCDIR)/aout/ar.h
+mtsparclinux.lo: mtsparclinux.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h \
+  $(INCDIR)/aout/aout64.h $(INCDIR)/aout/stab_gnu.h $(INCDIR)/aout/stab.def \
+  $(INCDIR)/aout/ar.h libaout.h $(INCDIR)/bfdlink.h aout-target.h 
 newsos3.lo: newsos3.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h \
   $(INCDIR)/aout/aout64.h $(INCDIR)/aout/stab_gnu.h $(INCDIR)/aout/stab.def \
   $(INCDIR)/aout/ar.h libaout.h $(INCDIR)/bfdlink.h aout-target.h
@@ -1911,6 +1934,11 @@ elf64-sparc.lo: elf64-sparc.c $(INCDIR)/filenames.h \
   $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h \
   $(INCDIR)/elf/sparc.h $(INCDIR)/elf/reloc-macros.h \
   $(INCDIR)/opcode/sparc.h elfxx-sparc.h elf64-target.h
+elf64-mtsparc.lo: elf64-mtsparc.c $(INCDIR)/filenames.h \
+  $(INCDIR)/hashtab.h elf-bfd.h $(INCDIR)/elf/common.h \
+  $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h \
+  $(INCDIR)/elf/sparc.h $(INCDIR)/elf/reloc-macros.h \
+  $(INCDIR)/opcode/mtsparc.h elfxx-mtsparc.h elf64-target.h
 elf64.lo: elf64.c elfcode.h $(INCDIR)/filenames.h $(INCDIR)/libiberty.h \
   $(INCDIR)/bfdlink.h $(INCDIR)/hashtab.h elf-bfd.h $(INCDIR)/elf/common.h \
   $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h elfcore.h

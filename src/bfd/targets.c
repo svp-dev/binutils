@@ -621,6 +621,7 @@ extern const bfd_target bfd_elf32_mep_little_vec;
 extern const bfd_target bfd_elf32_mn10200_vec;
 extern const bfd_target bfd_elf32_mn10300_vec;
 extern const bfd_target bfd_elf32_mt_vec;
+extern const bfd_target bfd_elf32_mtsparc_vec;
 extern const bfd_target bfd_elf32_msp430_vec;
 extern const bfd_target bfd_elf32_nbigmips_vec;
 extern const bfd_target bfd_elf32_nlittlemips_vec;
@@ -676,6 +677,7 @@ extern const bfd_target bfd_elf64_little_generic_vec;
 extern const bfd_target bfd_elf64_littlemips_vec;
 extern const bfd_target bfd_elf64_mmix_vec;
 extern const bfd_target bfd_elf64_mtalpha_vec;
+extern const bfd_target bfd_elf64_mtsparc_vec;
 extern const bfd_target bfd_elf64_powerpc_vec;
 extern const bfd_target bfd_elf64_powerpcle_vec;
 extern const bfd_target bfd_elf64_s390_vec;
@@ -748,6 +750,7 @@ extern const bfd_target mcore_pei_big_vec;
 extern const bfd_target mcore_pei_little_vec;
 extern const bfd_target mipslpe_vec;
 extern const bfd_target mipslpei_vec;
+extern const bfd_target mtsparclinux_vec;
 extern const bfd_target newsos3_vec;
 extern const bfd_target nlm32_alpha_vec;
 extern const bfd_target nlm32_i386_vec;
@@ -985,6 +988,7 @@ static const bfd_target * const _bfd_target_vector[] =
 	&bfd_elf32_sh64lin_vec,
 	&bfd_elf32_sh64blin_vec,
 #endif
+	&bfd_elf32_mtsparc_vec,
 	&bfd_elf32_sparc_vec,
 	&bfd_elf32_sparc_vxworks_vec,
 	&bfd_elf32_spu_vec,

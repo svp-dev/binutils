@@ -91,6 +91,7 @@ m88*)		 targ_archs=bfd_m88k_arch ;;
 maxq*)		 targ_archs=bfd_maxq_arch ;;
 mips*)		 targ_archs=bfd_mips_arch ;;
 mtalpha*)	 targ_archs=bfd_mtalpha_arch ;;
+mtsparc*)	 targ_archs=bfd_mtsparc_arch ;;
 or32*)		 targ_archs=bfd_or32_arch ;;
 pdp11*)		 targ_archs=bfd_pdp11_arch ;;
 pj*)		 targ_archs="bfd_pj_arch bfd_i386_arch";;
@@ -1001,6 +1002,12 @@ case "${targ}" in
     want64=true
     ;;
 #endif
+
+  mtsparc-*-linux-*)
+    targ_defvec=bfd_elf32_mtsparc_vec
+    targ_selvecs="mtsparclinux_vec bfd_elf64_mtsparc_vec sunos_big_vec"
+    ;;
+
   msp430-*-*)
     targ_defvec=bfd_elf32_msp430_vec
     ;;
