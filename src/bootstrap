@@ -5,3 +5,4 @@ for i in bfd binutils etc gas gprof intl ld libiberty opcodes; do
    (cd $i && $AUTORECONF -v -f -i)
 done
 $AUTORECONF -v -f -i
+patch <config.sub.patch
