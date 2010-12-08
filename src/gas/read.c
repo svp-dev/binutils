@@ -209,7 +209,7 @@ static int dwarf_file_string;
 #endif
 
 static void do_s_func (int end_p, const char *default_prefix);
-static void do_align (int, char *, int, int);
+void do_align (int, char *, int, int);
 static void s_align (int, int);
 static void s_altmacro (int);
 static void s_bad_end (int);
@@ -1222,7 +1222,7 @@ s_abort (int ignore ATTRIBUTE_UNUSED)
    the maximum number of characters to skip when doing the alignment,
    or 0 if there is no maximum.  */
 
-static void
+void
 do_align (int n, char *fill, int len, int max)
 {
   if (now_seg == absolute_section)
