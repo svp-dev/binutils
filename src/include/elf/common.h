@@ -253,6 +253,9 @@
 /* Alpha backend magic number.  Written in the absence of an ABI.  */
 #define EM_ALPHA		0x9026
 
+/* Microthread Alpha backend magic number.  Written in the absence of an ABI.  */
+#define EM_MTALPHA		0xafef
+
 /* Cygnus M32R ELF backend.  Written in the absence of an ABI.  */
 #define EM_CYGNUS_M32R		0x9041
 
