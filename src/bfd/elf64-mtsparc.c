@@ -24,7 +24,7 @@
 #include "libbfd.h"
 #include "elf-bfd.h"
 #include "elf/sparc.h"
-#include "opcode/sparc.h"
+#include "opcode/mtsparc.h"
 #include "elfxx-sparc.h"
 
 /* In case we're on a 32-bit machine, construct a 64-bit "-1" value.  */
@@ -35,13 +35,13 @@
    more space.  */
 
 static long
-elf64_sparc_get_reloc_upper_bound (bfd *abfd ATTRIBUTE_UNUSED, asection *sec)
+elf64_mtsparc_get_reloc_upper_bound (bfd *abfd ATTRIBUTE_UNUSED, asection *sec)
 {
   return (sec->reloc_count * 2 + 1) * sizeof (arelent *);
 }
 
 static long
-elf64_sparc_get_dynamic_reloc_upper_bound (bfd *abfd)
+elf64_mtsparc_get_dynamic_reloc_upper_bound (bfd *abfd)
 {
   return _bfd_elf_get_dynamic_reloc_upper_bound (abfd) * 2;
 }
@@ -52,7 +52,7 @@ elf64_sparc_get_dynamic_reloc_upper_bound (bfd *abfd)
    for the same location,  R_SPARC_LO10 and R_SPARC_13.  */
 
 static bfd_boolean
-elf64_sparc_slurp_one_reloc_table (bfd *abfd, asection *asect,
+elf64_mtsparc_slurp_one_reloc_table (bfd *abfd, asection *asect,
 				   Elf_Internal_Shdr *rel_hdr,
 				   asymbol **symbols, bfd_boolean dynamic)
 {
@@ -146,7 +146,7 @@ elf64_sparc_slurp_one_reloc_table (bfd *abfd, asection *asect,
 /* Read in and swap the external relocs.  */
 
 static bfd_boolean
-elf64_sparc_slurp_reloc_table (bfd *abfd, asection *asect,
+elf64_mtsparc_slurp_reloc_table (bfd *abfd, asection *asect,
 			       asymbol **symbols, bfd_boolean dynamic)
 {
   struct bfd_elf_section_data * const d = elf_section_data (asect);
@@ -189,16 +189,16 @@ elf64_sparc_slurp_reloc_table (bfd *abfd, asection *asect,
   if (asect->relocation == NULL)
     return FALSE;
 
-  /* The elf64_sparc_slurp_one_reloc_table routine increments
+  /* The elf64_mtsparc_slurp_one_reloc_table routine increments
      canon_reloc_count.  */
   canon_reloc_count (asect) = 0;
 
-  if (!elf64_sparc_slurp_one_reloc_table (abfd, asect, rel_hdr, symbols,
+  if (!elf64_mtsparc_slurp_one_reloc_table (abfd, asect, rel_hdr, symbols,
 					  dynamic))
     return FALSE;
 
   if (rel_hdr2
-      && !elf64_sparc_slurp_one_reloc_table (abfd, asect, rel_hdr2, symbols,
+      && !elf64_mtsparc_slurp_one_reloc_table (abfd, asect, rel_hdr2, symbols,
 					     dynamic))
     return FALSE;
 
@@ -208,7 +208,7 @@ elf64_sparc_slurp_reloc_table (bfd *abfd, asection *asect,
 /* Canonicalize the relocs.  */
 
 static long
-elf64_sparc_canonicalize_reloc (bfd *abfd, sec_ptr section,
+elf64_mtsparc_canonicalize_reloc (bfd *abfd, sec_ptr section,
 				arelent **relptr, asymbol **symbols)
 {
   arelent *tblptr;
@@ -238,7 +238,7 @@ elf64_sparc_canonicalize_reloc (bfd *abfd, sec_ptr section,
    section.  */
 
 static long
-elf64_sparc_canonicalize_dynamic_reloc (bfd *abfd, arelent **storage,
+elf64_mtsparc_canonicalize_dynamic_reloc (bfd *abfd, arelent **storage,
 					asymbol **syms)
 {
   asection *s;
@@ -259,7 +259,7 @@ elf64_sparc_canonicalize_dynamic_reloc (bfd *abfd, arelent **storage,
 	  arelent *p;
 	  long count, i;
 
-	  if (! elf64_sparc_slurp_reloc_table (abfd, s, syms, TRUE))
+	  if (! elf64_mtsparc_slurp_reloc_table (abfd, s, syms, TRUE))
 	    return -1;
 	  count = canon_reloc_count (s);
 	  p = s->relocation;
@@ -277,7 +277,7 @@ elf64_sparc_canonicalize_dynamic_reloc (bfd *abfd, arelent **storage,
 /* Write out the relocs.  */
 
 static void
-elf64_sparc_write_relocs (bfd *abfd, asection *sec, PTR data)
+elf64_mtsparc_write_relocs (bfd *abfd, asection *sec, PTR data)
 {
   bfd_boolean *failedp = (bfd_boolean *) data;
   Elf_Internal_Shdr *rela_hdr;
@@ -416,7 +416,7 @@ elf64_sparc_write_relocs (bfd *abfd, asection *sec, PTR data)
    file.  We use it for STT_REGISTER symbols.  */
 
 static bfd_boolean
-elf64_sparc_add_symbol_hook (bfd *abfd, struct bfd_link_info *info,
+elf64_mtsparc_add_symbol_hook (bfd *abfd, struct bfd_link_info *info,
 			     Elf_Internal_Sym *sym, const char **namep,
 			     flagword *flagsp ATTRIBUTE_UNUSED,
 			     asection **secp ATTRIBUTE_UNUSED,
@@ -444,7 +444,7 @@ elf64_sparc_add_symbol_hook (bfd *abfd, struct bfd_link_info *info,
       if (info->hash->creator != abfd->xvec
 	  || (abfd->flags & DYNAMIC) != 0)
         {
-	  /* STT_REGISTER only works when linking an elf64_sparc object.
+	  /* STT_REGISTER only works when linking an elf64_mtsparc object.
 	     If STT_REGISTER comes from a dynamic object, don't put it into
 	     the output bfd.  The dynamic linker will recheck it.  */
 	  *namep = NULL;
@@ -536,7 +536,7 @@ elf64_sparc_add_symbol_hook (bfd *abfd, struct bfd_link_info *info,
    which we cannot easily keep in the symbol hash table.  */
 
 static bfd_boolean
-elf64_sparc_output_arch_syms (bfd *output_bfd ATTRIBUTE_UNUSED,
+elf64_mtsparc_output_arch_syms (bfd *output_bfd ATTRIBUTE_UNUSED,
 			      struct bfd_link_info *info,
 			      PTR finfo, bfd_boolean (*func) (PTR, const char *,
 							      Elf_Internal_Sym *,
@@ -596,7 +596,7 @@ elf64_sparc_output_arch_syms (bfd *output_bfd ATTRIBUTE_UNUSED,
 }
 
 static int
-elf64_sparc_get_symbol_type (Elf_Internal_Sym *elf_sym, int type)
+elf64_mtsparc_get_symbol_type (Elf_Internal_Sym *elf_sym, int type)
 {
   if (ELF_ST_TYPE (elf_sym->st_info) == STT_REGISTER)
     return STT_REGISTER;
@@ -608,7 +608,7 @@ elf64_sparc_get_symbol_type (Elf_Internal_Sym *elf_sym, int type)
    even in SHN_UNDEF section.  */
 
 static void
-elf64_sparc_symbol_processing (bfd *abfd ATTRIBUTE_UNUSED, asymbol *asym)
+elf64_mtsparc_symbol_processing (bfd *abfd ATTRIBUTE_UNUSED, asymbol *asym)
 {
   elf_symbol_type *elfsym;
 
@@ -627,7 +627,7 @@ elf64_sparc_symbol_processing (bfd *abfd ATTRIBUTE_UNUSED, asymbol *asym)
    object file when linking.  */
 
 static bfd_boolean
-elf64_sparc_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
+elf64_mtsparc_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
 {
   bfd_boolean error;
   flagword new_flags, old_flags;
@@ -712,7 +712,7 @@ elf64_sparc_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
 /* MARCO: Set the correct entry size for the .stab section.  */
 
 static bfd_boolean
-elf64_sparc_fake_sections (bfd *abfd ATTRIBUTE_UNUSED,
+elf64_mtsparc_fake_sections (bfd *abfd ATTRIBUTE_UNUSED,
 			   Elf_Internal_Shdr *hdr ATTRIBUTE_UNUSED,
 			   asection *sec)
 {
@@ -732,7 +732,7 @@ elf64_sparc_fake_sections (bfd *abfd ATTRIBUTE_UNUSED,
 /* Print a STT_REGISTER symbol to file FILE.  */
 
 static const char *
-elf64_sparc_print_symbol_all (bfd *abfd ATTRIBUTE_UNUSED, PTR filep,
+elf64_mtsparc_print_symbol_all (bfd *abfd ATTRIBUTE_UNUSED, PTR filep,
 			      asymbol *symbol)
 {
   FILE *file = (FILE *) filep;
@@ -756,7 +756,7 @@ elf64_sparc_print_symbol_all (bfd *abfd ATTRIBUTE_UNUSED, PTR filep,
 }
 
 static enum elf_reloc_type_class
-elf64_sparc_reloc_type_class (const Elf_Internal_Rela *rela)
+elf64_mtsparc_reloc_type_class (const Elf_Internal_Rela *rela)
 {
   switch ((int) ELF64_R_TYPE (rela->r_info))
     {
@@ -776,7 +776,7 @@ elf64_sparc_reloc_type_class (const Elf_Internal_Rela *rela)
    ELF64_R_TYPE_DATA field.  This structure is used to redirect the
    relocation handling routines.  */
 
-const struct elf_size_info elf64_sparc_size_info =
+const struct elf_size_info elf64_mtsparc_size_info =
 {
   sizeof (Elf64_External_Ehdr),
   sizeof (Elf64_External_Phdr),
@@ -799,10 +799,10 @@ const struct elf_size_info elf64_sparc_size_info =
   bfd_elf64_write_out_phdrs,
   bfd_elf64_write_shdrs_and_ehdr,
   bfd_elf64_checksum_contents,
-  elf64_sparc_write_relocs,
+  elf64_mtsparc_write_relocs,
   bfd_elf64_swap_symbol_in,
   bfd_elf64_swap_symbol_out,
-  elf64_sparc_slurp_reloc_table,
+  elf64_mtsparc_slurp_reloc_table,
   bfd_elf64_slurp_symbol_table,
   bfd_elf64_swap_dyn_in,
   bfd_elf64_swap_dyn_out,
@@ -812,44 +812,44 @@ const struct elf_size_info elf64_sparc_size_info =
   bfd_elf64_swap_reloca_out
 };
 
-#define TARGET_BIG_SYM	bfd_elf64_sparc_vec
-#define TARGET_BIG_NAME	"elf64-sparc"
-#define ELF_ARCH	bfd_arch_sparc
+#define TARGET_BIG_SYM	bfd_elf64_mtsparc_vec
+#define TARGET_BIG_NAME	"elf64-mtsparc"
+#define ELF_ARCH	bfd_arch_mtsparc
 #define ELF_MAXPAGESIZE 0x100000
 #define ELF_COMMONPAGESIZE 0x2000
 
 /* This is the official ABI value.  */
-#define ELF_MACHINE_CODE EM_SPARCV9
+#define ELF_MACHINE_CODE EM_MTSPARCV9
 
 /* This is the value that we used before the ABI was released.  */
 #define ELF_MACHINE_ALT1 EM_OLD_SPARCV9
 
 #define elf_backend_reloc_type_class \
-  elf64_sparc_reloc_type_class
+  elf64_mtsparc_reloc_type_class
 #define bfd_elf64_get_reloc_upper_bound \
-  elf64_sparc_get_reloc_upper_bound
+  elf64_mtsparc_get_reloc_upper_bound
 #define bfd_elf64_get_dynamic_reloc_upper_bound \
-  elf64_sparc_get_dynamic_reloc_upper_bound
+  elf64_mtsparc_get_dynamic_reloc_upper_bound
 #define bfd_elf64_canonicalize_reloc \
-  elf64_sparc_canonicalize_reloc
+  elf64_mtsparc_canonicalize_reloc
 #define bfd_elf64_canonicalize_dynamic_reloc \
-  elf64_sparc_canonicalize_dynamic_reloc
+  elf64_mtsparc_canonicalize_dynamic_reloc
 #define elf_backend_add_symbol_hook \
-  elf64_sparc_add_symbol_hook
+  elf64_mtsparc_add_symbol_hook
 #define elf_backend_get_symbol_type \
-  elf64_sparc_get_symbol_type
+  elf64_mtsparc_get_symbol_type
 #define elf_backend_symbol_processing \
-  elf64_sparc_symbol_processing
+  elf64_mtsparc_symbol_processing
 #define elf_backend_print_symbol_all \
-  elf64_sparc_print_symbol_all
+  elf64_mtsparc_print_symbol_all
 #define elf_backend_output_arch_syms \
-  elf64_sparc_output_arch_syms
+  elf64_mtsparc_output_arch_syms
 #define bfd_elf64_bfd_merge_private_bfd_data \
-  elf64_sparc_merge_private_bfd_data
+  elf64_mtsparc_merge_private_bfd_data
 #define elf_backend_fake_sections \
-  elf64_sparc_fake_sections
+  elf64_mtsparc_fake_sections
 #define elf_backend_size_info \
-  elf64_sparc_size_info
+  elf64_mtsparc_size_info
 
 #define elf_backend_plt_sym_val	\
   _bfd_sparc_elf_plt_sym_val
@@ -911,16 +911,16 @@ const struct elf_size_info elf64_sparc_size_info =
 
 /* FreeBSD support */
 #undef  TARGET_BIG_SYM
-#define TARGET_BIG_SYM bfd_elf64_sparc_freebsd_vec
+#define TARGET_BIG_SYM bfd_elf64_mtsparc_freebsd_vec
 #undef  TARGET_BIG_NAME
-#define TARGET_BIG_NAME "elf64-sparc-freebsd"
+#define TARGET_BIG_NAME "elf64-mtsparc-freebsd"
 #undef	ELF_OSABI
 #define	ELF_OSABI ELFOSABI_FREEBSD
 
 #undef  elf_backend_post_process_headers
 #define elf_backend_post_process_headers	_bfd_elf_set_osabi
 #undef  elf64_bed
-#define elf64_bed				elf64_sparc_fbsd_bed
+#define elf64_bed				elf64_mtsparc_fbsd_bed
 
 #include "elf64-target.h"
 

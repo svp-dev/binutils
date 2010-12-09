@@ -29,10 +29,10 @@ static const bfd_arch_info_type arch_info_struct[] =
     32,	/* bits in a word */
     32,	/* bits in an address */
     8,	/* bits in a byte */
-    bfd_arch_sparc,
+    bfd_arch_mtsparc,
     bfd_mach_sparc_sparclet,
-    "sparc",
-    "sparc:sparclet",
+    "mtsparc",
+    "mtsparc:sparclet",
     3,
     FALSE,
     bfd_default_compatible,
@@ -43,10 +43,10 @@ static const bfd_arch_info_type arch_info_struct[] =
     32,	/* bits in a word */
     32,	/* bits in an address */
     8,	/* bits in a byte */
-    bfd_arch_sparc,
+    bfd_arch_mtsparc,
     bfd_mach_sparc_sparclite,
-    "sparc",
-    "sparc:sparclite",
+    "mtsparc",
+    "mtsparc:sparclite",
     3,
     FALSE,
     bfd_default_compatible,
@@ -57,10 +57,10 @@ static const bfd_arch_info_type arch_info_struct[] =
     32,	/* bits in a word */
     32,	/* bits in an address */
     8,	/* bits in a byte */
-    bfd_arch_sparc,
+    bfd_arch_mtsparc,
     bfd_mach_sparc_v8plus,
-    "sparc",
-    "sparc:v8plus",
+    "mtsparc",
+    "mtsparc:v8plus",
     3,
     FALSE,
     bfd_default_compatible,
@@ -71,10 +71,10 @@ static const bfd_arch_info_type arch_info_struct[] =
     32,	/* bits in a word */
     32,	/* bits in an address */
     8,	/* bits in a byte */
-    bfd_arch_sparc,
+    bfd_arch_mtsparc,
     bfd_mach_sparc_v8plusa,
-    "sparc",
-    "sparc:v8plusa",
+    "mtsparc",
+    "mtsparc:v8plusa",
     3,
     FALSE,
     bfd_default_compatible,
@@ -85,10 +85,10 @@ static const bfd_arch_info_type arch_info_struct[] =
     32,	/* bits in a word */
     32,	/* bits in an address */
     8,	/* bits in a byte */
-    bfd_arch_sparc,
+    bfd_arch_mtsparc,
     bfd_mach_sparc_sparclite_le,
-    "sparc",
-    "sparc:sparclite_le",
+    "mtsparc",
+    "mtsparc:sparclite_le",
     3,
     FALSE,
     bfd_default_compatible,
@@ -99,10 +99,10 @@ static const bfd_arch_info_type arch_info_struct[] =
     64,	/* bits in a word */
     64,	/* bits in an address */
     8,	/* bits in a byte */
-    bfd_arch_sparc,
+    bfd_arch_mtsparc,
     bfd_mach_sparc_v9,
-    "sparc",
-    "sparc:v9",
+    "mtsparc",
+    "mtsparc:v9",
     3,
     FALSE,
     bfd_default_compatible,
@@ -113,10 +113,10 @@ static const bfd_arch_info_type arch_info_struct[] =
     64,	/* bits in a word */
     64,	/* bits in an address */
     8,	/* bits in a byte */
-    bfd_arch_sparc,
+    bfd_arch_mtsparc,
     bfd_mach_sparc_v9a,
-    "sparc",
-    "sparc:v9a",
+    "mtsparc",
+    "mtsparc:v9a",
     3,
     FALSE,
     bfd_default_compatible,
@@ -127,10 +127,10 @@ static const bfd_arch_info_type arch_info_struct[] =
     32,	/* bits in a word */
     32,	/* bits in an address */
     8,	/* bits in a byte */
-    bfd_arch_sparc,
+    bfd_arch_mtsparc,
     bfd_mach_sparc_v8plusb,
-    "sparc",
-    "sparc:v8plusb",
+    "mtsparc",
+    "mtsparc:v8plusb",
     3,
     FALSE,
     bfd_default_compatible,
@@ -141,10 +141,10 @@ static const bfd_arch_info_type arch_info_struct[] =
     64,	/* bits in a word */
     64,	/* bits in an address */
     8,	/* bits in a byte */
-    bfd_arch_sparc,
+    bfd_arch_mtsparc,
     bfd_mach_sparc_v9b,
-    "sparc",
-    "sparc:v9b",
+    "mtsparc",
+    "mtsparc:v9b",
     3,
     FALSE,
     bfd_default_compatible,
@@ -153,18 +153,18 @@ static const bfd_arch_info_type arch_info_struct[] =
   }
 };
 
-const bfd_arch_info_type bfd_sparc_arch =
+const bfd_arch_info_type bfd_mtsparc_arch =
   {
     32,	/* bits in a word */
     32,	/* bits in an address */
     8,	/* bits in a byte */
-    bfd_arch_sparc,
-    bfd_mach_sparc,
-    "sparc",
-    "sparc",
+    bfd_arch_mtsparc,
+    bfd_mach_mtsparc,
+    "mtsparc",
+    "mtsparc",
     3,
     TRUE, /* the default */
     bfd_default_compatible,
     bfd_default_scan,
-    &arch_info_struct[0],
+    NULL,//&arch_info_struct[0],
   };

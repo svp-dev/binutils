@@ -1,4 +1,4 @@
-/* SPARC-specific support for 32-bit ELF
+/* Microthread SPARC-specific support for 32-bit ELF
    Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
    2003, 2004, 2005, 2007 Free Software Foundation, Inc.
 
@@ -32,7 +32,7 @@
 /* Support for core dump NOTE sections.  */
 
 static bfd_boolean
-elf32_sparc_grok_psinfo (bfd *abfd, Elf_Internal_Note *note)
+elf32_mtsparc_grok_psinfo (bfd *abfd, Elf_Internal_Note *note)
 {
   switch (note->descsz)
     {
@@ -68,7 +68,7 @@ elf32_sparc_grok_psinfo (bfd *abfd, Elf_Internal_Note *note)
    object file when linking.  */
 
 static bfd_boolean
-elf32_sparc_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
+elf32_mtsparc_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
 {
   bfd_boolean error;
   unsigned long ibfd_mach;
@@ -91,7 +91,7 @@ elf32_sparc_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
   else if ((ibfd->flags & DYNAMIC) == 0)
     {
       if (bfd_get_mach (obfd) < ibfd_mach)
-	bfd_set_arch_mach (obfd, bfd_arch_sparc, ibfd_mach);
+	bfd_set_arch_mach (obfd, bfd_arch_mtsparc, ibfd_mach);
     }
 
   if (((elf_elfheader (ibfd)->e_flags & EF_SPARC_LEDATA)
@@ -117,15 +117,18 @@ elf32_sparc_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
    We need to set the e_machine field appropriately.  */
 
 static void
-elf32_sparc_final_write_processing (bfd *abfd,
+elf32_mtsparc_final_write_processing (bfd *abfd,
 				    bfd_boolean linker ATTRIBUTE_UNUSED)
 {
   switch (bfd_get_mach (abfd))
     {
-    case bfd_mach_sparc :
+    case bfd_mach_mtsparc :
+      break; /* nothing to do */
+#if 0
+    // Don't have these for Microthreaded sparc anyway
     case bfd_mach_sparc_sparclet :
     case bfd_mach_sparc_sparclite :
-      break; /* nothing to do */
+        break;
     case bfd_mach_sparc_v8plus :
       elf_elfheader (abfd)->e_machine = EM_SPARC32PLUS;
       elf_elfheader (abfd)->e_flags &=~ EF_SPARC_32PLUS_MASK;
@@ -145,6 +148,7 @@ elf32_sparc_final_write_processing (bfd *abfd,
     case bfd_mach_sparc_sparclite_le :
       elf_elfheader (abfd)->e_flags |= EF_SPARC_LEDATA;
       break;
+#endif
     default :
       abort ();
       break;
@@ -152,7 +156,7 @@ elf32_sparc_final_write_processing (bfd *abfd,
 }
 
 static enum elf_reloc_type_class
-elf32_sparc_reloc_type_class (const Elf_Internal_Rela *rela)
+elf32_mtsparc_reloc_type_class (const Elf_Internal_Rela *rela)
 {
   switch ((int) ELF32_R_TYPE (rela->r_info))
     {
@@ -167,20 +171,19 @@ elf32_sparc_reloc_type_class (const Elf_Internal_Rela *rela)
     }
 }
 
-#define TARGET_BIG_SYM	bfd_elf32_sparc_vec
-#define TARGET_BIG_NAME	"elf32-sparc"
-#define ELF_ARCH	bfd_arch_sparc
-#define ELF_MACHINE_CODE EM_SPARC
-#define ELF_MACHINE_ALT1 EM_SPARC32PLUS
+#define TARGET_BIG_SYM	bfd_elf32_mtsparc_vec
+#define TARGET_BIG_NAME	"elf32-mtsparc"
+#define ELF_ARCH	bfd_arch_mtsparc
+#define ELF_MACHINE_CODE EM_MTSPARC
 #define ELF_MAXPAGESIZE 0x10000
 #define ELF_COMMONPAGESIZE 0x2000
 
 #define bfd_elf32_bfd_merge_private_bfd_data \
-					elf32_sparc_merge_private_bfd_data
+					elf32_mtsparc_merge_private_bfd_data
 #define elf_backend_final_write_processing \
-					elf32_sparc_final_write_processing
-#define elf_backend_grok_psinfo		elf32_sparc_grok_psinfo
-#define elf_backend_reloc_type_class	elf32_sparc_reloc_type_class
+					elf32_mtsparc_final_write_processing
+#define elf_backend_grok_psinfo		elf32_mtsparc_grok_psinfo
+#define elf_backend_reloc_type_class	elf32_mtsparc_reloc_type_class
 
 #define elf_info_to_howto		_bfd_sparc_elf_info_to_howto
 #define bfd_elf32_bfd_reloc_type_lookup	_bfd_sparc_elf_reloc_type_lookup
@@ -226,7 +229,7 @@ elf32_sparc_reloc_type_class (const Elf_Internal_Rela *rela)
    the target system as VxWorks.  */
 
 static struct bfd_link_hash_table *
-elf32_sparc_vxworks_link_hash_table_create (bfd *abfd)
+elf32_mtsparc_vxworks_link_hash_table_create (bfd *abfd)
 {
   struct bfd_link_hash_table *ret;
 
@@ -245,23 +248,23 @@ elf32_sparc_vxworks_link_hash_table_create (bfd *abfd)
    specific handling.  */
 
 static void
-elf32_sparc_vxworks_final_write_processing (bfd *abfd, bfd_boolean linker)
+elf32_mtsparc_vxworks_final_write_processing (bfd *abfd, bfd_boolean linker)
 {
-  elf32_sparc_final_write_processing (abfd, linker);
+  elf32_mtsparc_final_write_processing (abfd, linker);
   elf_vxworks_final_write_processing (abfd, linker);
 }
 
 #undef TARGET_BIG_SYM
-#define TARGET_BIG_SYM	bfd_elf32_sparc_vxworks_vec
+#define TARGET_BIG_SYM	bfd_elf32_mtsparc_vxworks_vec
 #undef TARGET_BIG_NAME
-#define TARGET_BIG_NAME	"elf32-sparc-vxworks"
+#define TARGET_BIG_NAME	"elf32-mtsparc-vxworks"
 
 #undef ELF_MINPAGESIZE
 #define ELF_MINPAGESIZE	0x1000
 
 #undef bfd_elf32_bfd_link_hash_table_create
 #define bfd_elf32_bfd_link_hash_table_create \
-  elf32_sparc_vxworks_link_hash_table_create
+  elf32_mtsparc_vxworks_link_hash_table_create
 
 #undef elf_backend_want_got_plt
 #define elf_backend_want_got_plt		1
@@ -280,9 +283,9 @@ elf32_sparc_vxworks_final_write_processing (bfd *abfd, bfd_boolean linker)
   elf_vxworks_emit_relocs
 #undef elf_backend_final_write_processing
 #define elf_backend_final_write_processing \
-  elf32_sparc_vxworks_final_write_processing
+  elf32_mtsparc_vxworks_final_write_processing
 
 #undef elf32_bed
-#define elf32_bed				sparc_elf_vxworks_bed
+#define elf32_bed				mtsparc_elf_vxworks_bed
 
 #include "elf32-target.h"

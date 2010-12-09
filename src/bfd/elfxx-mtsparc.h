@@ -1,4 +1,4 @@
-/* SPARC ELF specific backend routines.
+/* Microthread SPARC ELF specific backend routines.
    Copyright 2005, 2007 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.

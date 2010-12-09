@@ -1,4 +1,4 @@
-/* BFD back-end for linux flavored sparc a.out binaries.
+/* BFD back-end for linux flavored Microthread sparc a.out binaries.
    Copyright 1992, 1993, 1994, 1995, 1996, 1997, 1999, 2000, 2001, 2002,
    2003, 2004, 2006, 2007 Free Software Foundation, Inc.
 
@@ -35,12 +35,12 @@
 #include "aout/ar.h"
 #include "libaout.h"           /* BFD a.out internal data structures */
 
-#define DEFAULT_ARCH bfd_arch_sparc
+#define DEFAULT_ARCH bfd_arch_mtsparc
 /* Do not "beautify" the CONCAT* macro args.  Traditional C will not
    remove whitespace added here, and thus will fail to concatenate
    the tokens.  */
-#define MY(OP) CONCAT2 (sparclinux_,OP)
-#define TARGETNAME "a.out-sparc-linux"
+#define MY(OP) CONCAT2 (mtsparclinux_,OP)
+#define TARGETNAME "a.out-mtsparc-linux"
 
 extern const bfd_target MY(vec);
 
@@ -51,11 +51,11 @@ extern const bfd_target MY(vec);
 static void MY_final_link_callback
   PARAMS ((bfd *, file_ptr *, file_ptr *, file_ptr *));
 
-static bfd_boolean sparclinux_bfd_final_link
+static bfd_boolean mtsparclinux_bfd_final_link
   PARAMS ((bfd *abfd, struct bfd_link_info *info));
 
 static bfd_boolean
-sparclinux_bfd_final_link (abfd, info)
+mtsparclinux_bfd_final_link (abfd, info)
      bfd *abfd;
      struct bfd_link_info *info;
 {
@@ -63,14 +63,14 @@ sparclinux_bfd_final_link (abfd, info)
   return NAME(aout,final_link) (abfd, info, MY_final_link_callback);
 }
 
-#define MY_bfd_final_link sparclinux_bfd_final_link
+#define MY_bfd_final_link mtsparclinux_bfd_final_link
 
 /* Set the machine type correctly.  */
 
-static bfd_boolean sparclinux_write_object_contents PARAMS ((bfd *abfd));
+static bfd_boolean mtsparclinux_write_object_contents PARAMS ((bfd *abfd));
 
 static bfd_boolean
-sparclinux_write_object_contents (abfd)
+mtsparclinux_write_object_contents (abfd)
      bfd *abfd;
 {
   struct external_exec exec_bytes;
@@ -85,7 +85,7 @@ sparclinux_write_object_contents (abfd)
   return TRUE;
 }
 
-#define MY_write_object_contents sparclinux_write_object_contents
+#define MY_write_object_contents mtsparclinux_write_object_contents
 /* Code to link against Linux a.out shared libraries.  */
 
 /* See if a symbol name is a reference to the global offset table.  */
@@ -551,7 +551,7 @@ linux_tally_symbols (struct linux_link_hash_entry *h, void * data)
    are required.  */
 
 bfd_boolean
-bfd_sparclinux_size_dynamic_sections (output_bfd, info)
+bfd_mtsparclinux_size_dynamic_sections (output_bfd, info)
      bfd *output_bfd;
      struct bfd_link_info *info;
 {
