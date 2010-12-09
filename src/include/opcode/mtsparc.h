@@ -1,4 +1,4 @@
-/* Definitions for opcode table for the sparc.
+/* Definitions for opcode table for the Microthread sparc.
    Copyright 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000, 2002,
    2003, 2005 Free Software Foundation, Inc.
 
@@ -140,6 +140,8 @@ typedef struct sparc_opcode
 	m	alternate space register (asr) in rd
 	M	alternate space register (asr) in rs1
 	h	22 high bits.
+	<   5 bit non-relocatable unsigned immediate in rs2
+	>   5 bit non-relocatable unsigned immediate in rd
 	X	5 bit unsigned immediate
 	Y	6 bit unsigned immediate
 	3	SIAM mode (3 bits). (v9b)
@@ -195,9 +197,11 @@ typedef struct sparc_opcode
 #define OP3(x)		(((x) & 0x3f) << 19) /* Op3 field of format3 insns.  */
 #define OP(x)		((unsigned) ((x) & 0x3) << 30) /* Op field of all insns.  */
 #define OPF(x)		(((x) & 0x1ff) << 5) /* Opf field of float insns.  */
+#define OPUT(x)		(((x) & 0x1ff) << 5) /* Oput field of CPOP1 (uT) insns.  */
 #define OPF_LOW5(x)	OPF ((x) & 0x1f)     /* V9.  */
 #define F3F(x, y, z)	(OP (x) | OP3 (y) | OPF (z)) /* Format3 float insns.  */
 #define F3I(x)		(((x) & 0x1) << 13)  /* Immediate field of format 3 insns.  */
+#define F3UT(x, y, z)	(OP (x) | OP3 (y) | OPUT (z)) /* Format3 CPOP1 (uT) insns.  */
 #define F2(x, y)	(OP (x) | OP2(y))    /* Format 2 insns.  */
 #define F3(x, y, z)	(OP (x) | OP3(y) | F3I(z)) /* Format3 insns.  */
 #define F1(x)		(OP (x))
