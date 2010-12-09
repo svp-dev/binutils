@@ -1,4 +1,4 @@
-/* This file is tc-alpha.h
+/* This file is tc-mtalpha.h
    Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
    2005, 2006, 2007
    Free Software Foundation, Inc.
@@ -27,21 +27,21 @@
 
 #define WORKING_DOT_WORD
 
-#define TARGET_ARCH			bfd_arch_alpha
+#define TARGET_ARCH			bfd_arch_mtalpha
 
 #ifdef TE_FreeBSD
-#define ELF_TARGET_FORMAT	"elf64-alpha-freebsd"
+#define ELF_TARGET_FORMAT	"elf64-mtalpha-freebsd"
 #endif
 #ifndef ELF_TARGET_FORMAT
-#define ELF_TARGET_FORMAT	"elf64-alpha"
+#define ELF_TARGET_FORMAT	"elf64-mtalpha"
 #endif
 
 #define TARGET_FORMAT (OUTPUT_FLAVOR == bfd_target_ecoff_flavour	\
-		       ? "ecoff-littlealpha"				\
+		       ? "ecoff-littlemtalpha"				\
 		       : OUTPUT_FLAVOR == bfd_target_elf_flavour	\
 		       ? ELF_TARGET_FORMAT				\
 		       : OUTPUT_FLAVOR == bfd_target_evax_flavour	\
-		       ? "vms-alpha"					\
+		       ? "vms-mtalpha"					\
 		       : "unknown-format")
 
 #define NEED_LITERAL_POOL
@@ -50,20 +50,20 @@
 struct fix;
 struct alpha_reloc_tag;
 
-extern int alpha_force_relocation (struct fix *);
-extern int alpha_fix_adjustable   (struct fix *);
+extern int mtalpha_force_relocation (struct fix *);
+extern int mtalpha_fix_adjustable   (struct fix *);
 
-extern unsigned long alpha_gprmask, alpha_fprmask;
-extern valueT alpha_gp_value;
+extern unsigned long mtalpha_gprmask, mtalpha_fprmask;
+extern valueT mtalpha_gp_value;
 
-#define TC_FORCE_RELOCATION(FIX)	alpha_force_relocation (FIX)
-#define tc_fix_adjustable(FIX)		alpha_fix_adjustable (FIX)
+#define TC_FORCE_RELOCATION(FIX)	mtalpha_force_relocation (FIX)
+#define tc_fix_adjustable(FIX)		mtalpha_fix_adjustable (FIX)
 #define RELOC_REQUIRES_SYMBOL
 
 /* Values passed to md_apply_fix don't include the symbol value.  */
 #define MD_APPLY_SYM_VALUE(FIX) 0
 
-#define md_convert_frag(b,s,f)		as_fatal ("alpha convert_frag\n")
+#define md_convert_frag(b,s,f)		as_fatal ("mtalpha convert_frag\n")
 #define md_estimate_size_before_relax(f,s) \
 			(as_fatal ("estimate_size_before_relax called"),1)
 #define md_operand(x)
@@ -99,31 +99,31 @@ extern valueT alpha_gp_value;
 #define md_number_to_chars		number_to_chars_littleendian
 
 extern int tc_get_register (int);
-extern void alpha_frob_ecoff_data (void);
+extern void mtalpha_frob_ecoff_data (void);
 
-#define tc_frob_label(sym) alpha_define_label (sym)
-extern void alpha_define_label (symbolS *);
+#define tc_frob_label(sym) mtalpha_define_label (sym)
+extern void mtalpha_define_label (symbolS *);
 
-#define md_cons_align(nbytes) alpha_cons_align (nbytes)
-extern void alpha_cons_align (int);
+#define md_cons_align(nbytes) mtalpha_cons_align (nbytes)
+extern void mtalpha_cons_align (int);
 
-#define HANDLE_ALIGN(fragp) alpha_handle_align (fragp)
-extern void alpha_handle_align (struct frag *);
+#define HANDLE_ALIGN(fragp) mtalpha_handle_align (fragp)
+extern void mtalpha_handle_align (struct frag *);
 
 #define MAX_MEM_FOR_RS_ALIGN_CODE  (3 + 4 + 8)
 
 #ifdef OBJ_ECOFF
-#define tc_frob_file_before_adjust() alpha_frob_file_before_adjust ()
-extern void alpha_frob_file_before_adjust (void);
+#define tc_frob_file_before_adjust() mtalpha_frob_file_before_adjust ()
+extern void mtalpha_frob_file_before_adjust (void);
 #endif
 
 #define DIFF_EXPR_OK   /* foo-. gets turned into PC relative relocs.  */
 
 #ifdef OBJ_ELF
-#define md_elf_section_letter		alpha_elf_section_letter
-extern int alpha_elf_section_letter (int, char **);
-#define md_elf_section_flags		alpha_elf_section_flags
-extern flagword alpha_elf_section_flags (flagword, int, int);
+#define md_elf_section_letter		mtalpha_elf_section_letter
+extern int mtalpha_elf_section_letter (int, char **);
+#define md_elf_section_flags		mtalpha_elf_section_flags
+extern flagword mtalpha_elf_section_flags (flagword, int, int);
 #endif
 
 /* Whether to add support for explicit !relocation_op!sequence_number.  At the
@@ -137,12 +137,12 @@ extern flagword alpha_elf_section_flags (flagword, int, int);
    supplied !lituse relocations follow the appropriate !literal
    relocations.  Also convert the gas-internal relocations to the
    appropriate linker relocations.  */
-#define tc_frob_file_before_fix() alpha_before_fix ()
-extern void alpha_before_fix (void);
+#define tc_frob_file_before_fix() mtalpha_before_fix ()
+extern void mtalpha_before_fix (void);
 
 #ifdef OBJ_ELF
-#define md_end  alpha_elf_md_end
-extern void alpha_elf_md_end (void);
+#define md_end  mtalpha_elf_md_end
+extern void mtalpha_elf_md_end (void);
 #endif
 
 /* New fields for supporting explicit relocations (such as !literal to mark
@@ -175,8 +175,8 @@ do {									\
 
 #define TARGET_USE_CFIPOP 1
 
-#define tc_cfi_frame_initial_instructions alpha_cfi_frame_initial_instructions
-extern void alpha_cfi_frame_initial_instructions (void);
+#define tc_cfi_frame_initial_instructions mtalpha_cfi_frame_initial_instructions
+extern void mtalpha_cfi_frame_initial_instructions (void);
 
 #define DWARF2_LINE_MIN_INSN_LENGTH	4
 #define DWARF2_DEFAULT_RETURN_COLUMN	26

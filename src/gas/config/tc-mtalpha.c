@@ -53,7 +53,7 @@
 #include "struc-symbol.h"
 #include "ecoff.h"
 
-#include "opcode/alpha.h"
+#include "opcode/mtalpha.h"
 
 #ifdef OBJ_ELF
 #include "elf/alpha.h"
@@ -251,6 +251,7 @@ struct option md_longopts[] =
 size_t md_longopts_size = sizeof (md_longopts);
 
 #ifdef OBJ_EVAX
+#error "EVAX mode not supported"
 #define AXP_REG_R0     0
 #define AXP_REG_R16    16
 #define AXP_REG_R17    17
@@ -363,6 +364,25 @@ static int alpha_flag_relax;
 
 /* What value to give to bfd_set_gp_size.  */
 static int g_switch_value = 8;
+
+/* The current location and value of the control word (Microthread specific) */
+static char*         control_word_ptr = NULL;
+static unsigned long control_word     = 0;
+static addressT      function_offset  = 0;
+
+struct register_count
+{
+    int global, local, shared;
+};
+
+struct register_counts
+{
+    int valid;
+    struct register_count ints, flts;
+};
+
+/* The current register counts */
+static struct register_counts register_counts = {0, {0,0,0}, {0,0,0}};
 
 #ifdef OBJ_EVAX
 /* Collect information about current procedure here.  */
@@ -549,10 +569,24 @@ get_alpha_reloc_tag (long sequence)
       strcpy (info->string, buffer);
       errmsg = hash_insert (alpha_literal_hash, info->string, (void *) info);
       if (errmsg)
-	as_fatal (errmsg);
+	as_fatal ("%s", errmsg);
     }
 
   return info;
+}
+
+static void
+emit_control_word(char* f)
+{
+  control_word_ptr = f;
+  control_word     = 0;
+  md_number_to_chars (f, control_word, 4);
+
+  if (alpha_insn_label != NULL)
+    {
+      /* Adjust label so it points to the data following the control word */
+      symbol_set_value_now (alpha_insn_label);
+    }
 }
 
 static void
@@ -713,7 +747,7 @@ alpha_adjust_relocs (bfd *abfd ATTRIBUTE_UNUSED,
    relocations, and similarly for !gpdisp relocations.  */
 
 void
-alpha_before_fix (void)
+mtalpha_before_fix (void)
 {
   if (alpha_literal_hash)
     bfd_map_over_sections (stdoutput, alpha_adjust_relocs, NULL);
@@ -1014,7 +1048,7 @@ find_opcode_match (const struct alpha_opcode *first_opcode,
 
       for (opidx = opcode->operands; *opidx; ++opidx)
 	{
-	  const struct alpha_operand *operand = &alpha_operands[*opidx];
+	  const struct alpha_operand *operand = &mtalpha_operands[*opidx];
 
 	  /* Only take input from real operands.  */
 	  if (operand->flags & AXP_OPERAND_FAKE)
@@ -1085,7 +1119,7 @@ find_opcode_match (const struct alpha_opcode *first_opcode,
 
     match_failed:;
     }
-  while (++opcode - alpha_opcodes < (int) alpha_num_opcodes
+  while (++opcode - mtalpha_opcodes < (int) mtalpha_num_opcodes
 	 && !strcmp (opcode->name, first_opcode->name));
 
   if (*pcpumatch)
@@ -1577,6 +1611,10 @@ alpha_align (int n,
       S_SET_VALUE (label, (valueT) frag_now_fix ());
     }
 
+  /* Since we independently keep track of the in-function offset
+   * we need to advance it manually */
+  function_offset += ((1 << n) - (function_offset % (1 << n))) % (1 << n);
+
   record_alignment (now_seg, n);
 
   /* ??? If alpha_flag_relax && force && elf, record the requested alignment
@@ -1591,16 +1629,26 @@ emit_insn (struct alpha_insn *insn)
   char *f;
   int i;
 
+  if ((function_offset % 64) == 0)
+   {
+      /* Output the control word first */
+      alpha_align (6, NULL, alpha_insn_label, 0);
+      emit_control_word (frag_more (4));
+      function_offset += 4;
+   }
+
   /* Take care of alignment duties.  */
   if (alpha_auto_align_on && alpha_current_align < 2)
     alpha_align (2, (char *) NULL, alpha_insn_label, 0);
   if (alpha_current_align > 2)
     alpha_current_align = 2;
-  alpha_insn_label = NULL;
 
   /* Write out the instruction.  */
+
+  alpha_insn_label = NULL;
   f = frag_more (4);
   md_number_to_chars (f, insn->insn, 4);
+  function_offset += 4;
 
 #ifdef OBJ_ELF
   dwarf2_emit_insn (4);
@@ -1618,7 +1666,7 @@ emit_insn (struct alpha_insn *insn)
       /* Some fixups are only used internally and so have no howto.  */
       if ((int) fixup->reloc < 0)
 	{
-	  operand = &alpha_operands[-(int) fixup->reloc];
+	  operand = &mtalpha_operands[-(int) fixup->reloc];
 	  size = 4;
 	  pcrel = ((operand->flags & AXP_OPERAND_RELATIVE) != 0);
 	}
@@ -1829,7 +1877,7 @@ insert_operand (unsigned insn,
 
       insn = (*operand->insert) (insn, val, &errmsg);
       if (errmsg)
-	as_warn (errmsg);
+	as_warn ("%s", errmsg);
     }
   else
     insn |= ((val & ((1 << operand->bits) - 1)) << operand->shift);
@@ -1858,7 +1906,7 @@ assemble_insn (const struct alpha_opcode *opcode,
 
   for (argidx = opcode->operands; *argidx; ++argidx)
     {
-      const struct alpha_operand *operand = &alpha_operands[*argidx];
+      const struct alpha_operand *operand = &mtalpha_operands[*argidx];
       const expressionS *t = (const expressionS *) 0;
 
       if (operand->flags & AXP_OPERAND_FAKE)
@@ -1904,9 +1952,12 @@ assemble_insn (const struct alpha_opcode *opcode,
 
 	case O_constant:
 	  image = insert_operand (image, operand, t->X_add_number, NULL, 0);
+	  if (reloc != BFD_RELOC_UNUSED)
+	  {
 	  assert (reloc_operand == NULL);
 	  reloc_operand = operand;
 	  reloc_exp = t;
+	  }
 	  break;
 
 	default:
@@ -2158,6 +2209,8 @@ emit_uldXu (const expressionS *tok,
   long lgsize = (long) vlgsize;
   expressionS newtok[3];
 
+  as_bad(_("uldXu not supported"));
+
   if (alpha_noat_on)
     as_bad (_("macro requires $at register while noat in effect"));
 
@@ -2240,6 +2293,8 @@ emit_stX (const expressionS *tok,
       struct alpha_insn insn;
       int basereg;
       long lituse;
+
+      as_bad(_("stX not supported"));
 
       if (alpha_noat_on)
 	as_bad (_("macro requires $at register while noat in effect"));
@@ -2335,6 +2390,8 @@ emit_ustX (const expressionS *tok,
   int lgsize = (int) (long) vlgsize;
   expressionS newtok[3];
 
+  as_bad(_("ustX not supported"));
+
   /* Emit "lda $at, exp".  */
   memcpy (newtok, tok, sizeof (expressionS) * ntok);
   newtok[0].X_add_number = AXP_REG_AT;
@@ -2424,35 +2481,25 @@ emit_sextX (const expressionS *tok,
     }
 }
 
-/* Implement the division and modulus macros.  */
-
-#ifdef OBJ_EVAX
-
-/* Make register usage like in normal procedure call.
-   Don't clobber PV and RA.  */
-
+/* Implement the modulus macros.  */
 static void
-emit_division (const expressionS *tok,
+emit_remainder (const expressionS *tok,
 	       int ntok,
-	       const void * symname)
+	       const void * suffix_)
 {
-  /* DIVISION and MODULUS. Yech.
+  /* MODULUS. Yech.
 
      Convert
         OP x,y,result
      to
-        mov x,R16	# if x != R16
-        mov y,R17	# if y != R17
-        lda AT,__OP
-        jsr AT,(AT),0
-        mov R0,result
-
-     with appropriate optimizations if R0,R16,R17 are the registers
-     specified by the compiler.  */
-
+        div x,y,AT
+        mul y,AT,AT
+        sub x,AT,result
+    */
   int xr, yr, rr;
-  symbolS *sym;
   expressionS newtok[3];
+  char opname[6];
+  const char* suffix = (const char*) suffix_;
 
   xr = regno (tok[0].X_add_number);
   yr = regno (tok[1].X_add_number);
@@ -2462,173 +2509,33 @@ emit_division (const expressionS *tok,
   else
     rr = regno (tok[2].X_add_number);
 
-  /* Move the operands into the right place.  */
-  if (yr == AXP_REG_R16 && xr == AXP_REG_R17)
-    {
-      /* They are in exactly the wrong order -- swap through AT.  */
       if (alpha_noat_on)
 	as_bad (_("macro requires $at register while noat in effect"));
 
-      set_tok_reg (newtok[0], AXP_REG_R16);
-      set_tok_reg (newtok[1], AXP_REG_AT);
-      assemble_tokens ("mov", newtok, 2, 1);
-
-      set_tok_reg (newtok[0], AXP_REG_R17);
-      set_tok_reg (newtok[1], AXP_REG_R16);
-      assemble_tokens ("mov", newtok, 2, 1);
-
-      set_tok_reg (newtok[0], AXP_REG_AT);
-      set_tok_reg (newtok[1], AXP_REG_R17);
-      assemble_tokens ("mov", newtok, 2, 1);
-    }
-  else
-    {
-      if (yr == AXP_REG_R16)
-	{
-	  set_tok_reg (newtok[0], AXP_REG_R16);
-	  set_tok_reg (newtok[1], AXP_REG_R17);
-	  assemble_tokens ("mov", newtok, 2, 1);
-	}
-
-      if (xr != AXP_REG_R16)
-	{
+  /* Do the division */
 	  set_tok_reg (newtok[0], xr);
-	  set_tok_reg (newtok[1], AXP_REG_R16);
-	  assemble_tokens ("mov", newtok, 2, 1);
-	}
+  set_tok_reg (newtok[1], yr);
+  set_tok_reg (newtok[2], AXP_REG_AT);
+  strcpy(opname, "div");
+  strcat(opname, suffix);
+  assemble_tokens (opname, newtok, 3, 1);
 
-      if (yr != AXP_REG_R16 && yr != AXP_REG_R17)
-	{
+  /* Do the multiply */
 	  set_tok_reg (newtok[0], yr);
-	  set_tok_reg (newtok[1], AXP_REG_R17);
-	  assemble_tokens ("mov", newtok, 2, 1);
-	}
-    }
-
-  sym = symbol_find_or_make ((const char *) symname);
-
-  set_tok_reg (newtok[0], AXP_REG_AT);
-  set_tok_sym (newtok[1], sym, 0);
-  assemble_tokens ("lda", newtok, 2, 1);
-
-  /* Call the division routine.  */
-  set_tok_reg (newtok[0], AXP_REG_AT);
-  set_tok_cpreg (newtok[1], AXP_REG_AT);
-  set_tok_const (newtok[2], 0);
-  assemble_tokens ("jsr", newtok, 3, 1);
-
-  /* Move the result to the right place.  */
-  if (rr != AXP_REG_R0)
-    {
-      set_tok_reg (newtok[0], AXP_REG_R0);
-      set_tok_reg (newtok[1], rr);
-      assemble_tokens ("mov", newtok, 2, 1);
-    }
-}
-
-#else /* !OBJ_EVAX */
-
-static void
-emit_division (const expressionS *tok,
-	       int ntok,
-	       const void * symname)
-{
-  /* DIVISION and MODULUS. Yech.
-     Convert
-        OP x,y,result
-     to
-        lda pv,__OP
-        mov x,t10
-        mov y,t11
-        jsr t9,(pv),__OP
-        mov t12,result
-
-     with appropriate optimizations if t10,t11,t12 are the registers
-     specified by the compiler.  */
-
-  int xr, yr, rr;
-  symbolS *sym;
-  expressionS newtok[3];
-
-  xr = regno (tok[0].X_add_number);
-  yr = regno (tok[1].X_add_number);
-
-  if (ntok < 3)
-    rr = xr;
-  else
-    rr = regno (tok[2].X_add_number);
-
-  sym = symbol_find_or_make ((const char *) symname);
-
-  /* Move the operands into the right place.  */
-  if (yr == AXP_REG_T10 && xr == AXP_REG_T11)
-    {
-      /* They are in exactly the wrong order -- swap through AT.  */
-      if (alpha_noat_on)
-	as_bad (_("macro requires $at register while noat in effect"));
-
-      set_tok_reg (newtok[0], AXP_REG_T10);
       set_tok_reg (newtok[1], AXP_REG_AT);
-      assemble_tokens ("mov", newtok, 2, 1);
+  set_tok_reg (newtok[2], AXP_REG_AT);
+  strcpy(opname, "mul_");
+  opname[3] = suffix[0];
+  assemble_tokens (opname, newtok, 3, 1);
 
-      set_tok_reg (newtok[0], AXP_REG_T11);
-      set_tok_reg (newtok[1], AXP_REG_T10);
-      assemble_tokens ("mov", newtok, 2, 1);
-
-      set_tok_reg (newtok[0], AXP_REG_AT);
-      set_tok_reg (newtok[1], AXP_REG_T11);
-      assemble_tokens ("mov", newtok, 2, 1);
-    }
-  else
-    {
-      if (yr == AXP_REG_T10)
-	{
-	  set_tok_reg (newtok[0], AXP_REG_T10);
-	  set_tok_reg (newtok[1], AXP_REG_T11);
-	  assemble_tokens ("mov", newtok, 2, 1);
-	}
-
-      if (xr != AXP_REG_T10)
-	{
+  /* Do the subtract */
 	  set_tok_reg (newtok[0], xr);
-	  set_tok_reg (newtok[1], AXP_REG_T10);
-	  assemble_tokens ("mov", newtok, 2, 1);
-	}
-
-      if (yr != AXP_REG_T10 && yr != AXP_REG_T11)
-	{
-	  set_tok_reg (newtok[0], yr);
-	  set_tok_reg (newtok[1], AXP_REG_T11);
-	  assemble_tokens ("mov", newtok, 2, 1);
-	}
-    }
-
-  /* Call the division routine.  */
-  set_tok_reg (newtok[0], AXP_REG_T9);
-  set_tok_sym (newtok[1], sym, 0);
-  assemble_tokens ("jsr", newtok, 2, 1);
-
-  /* Reload the GP register.  */
-#ifdef OBJ_AOUT
-FIXME
-#endif
-#if defined(OBJ_ECOFF) || defined(OBJ_ELF)
-  set_tok_reg (newtok[0], alpha_gp_register);
-  set_tok_const (newtok[1], 0);
-  set_tok_preg (newtok[2], AXP_REG_T9);
-  assemble_tokens ("ldgp", newtok, 3, 1);
-#endif
-
-  /* Move the result to the right place.  */
-  if (rr != AXP_REG_T12)
-    {
-      set_tok_reg (newtok[0], AXP_REG_T12);
-      set_tok_reg (newtok[1], rr);
-      assemble_tokens ("mov", newtok, 2, 1);
-    }
+  set_tok_reg (newtok[1], AXP_REG_AT);
+  set_tok_reg (newtok[2], rr);
+  strcpy(opname, "sub_");
+  opname[3] = suffix[0];
+  assemble_tokens (opname, newtok, 3, 1);
 }
-
-#endif /* !OBJ_EVAX */
 
 /* The jsr and jmp macros differ from their instruction counterparts
    in that they can load the target address and default most
@@ -2886,46 +2793,18 @@ static const struct alpha_macro alpha_macros[] =
       MACRO_IR, MACRO_EOA,
       /* MACRO_EXP, MACRO_IR, MACRO_EOA */ } },
 
-  { "divl",	emit_division, "__divl",
+  { "reml",	emit_remainder, "l",
     { MACRO_IR, MACRO_IR, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_IR, MACRO_EOA,
-      /* MACRO_IR, MACRO_EXP, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_EXP, MACRO_EOA */ } },
-  { "divlu",	emit_division, "__divlu",
+      MACRO_IR, MACRO_IR, MACRO_EOA, } },
+  { "remlu",	emit_remainder, "lu",
     { MACRO_IR, MACRO_IR, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_IR, MACRO_EOA,
-      /* MACRO_IR, MACRO_EXP, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_EXP, MACRO_EOA */ } },
-  { "divq",	emit_division, "__divq",
+      MACRO_IR, MACRO_IR, MACRO_EOA, } },
+  { "remq",	emit_remainder, "q",
     { MACRO_IR, MACRO_IR, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_IR, MACRO_EOA,
-      /* MACRO_IR, MACRO_EXP, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_EXP, MACRO_EOA */ } },
-  { "divqu",	emit_division, "__divqu",
+      MACRO_IR, MACRO_IR, MACRO_EOA, } },
+  { "remqu",	emit_remainder, "qu",
     { MACRO_IR, MACRO_IR, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_IR, MACRO_EOA,
-      /* MACRO_IR, MACRO_EXP, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_EXP, MACRO_EOA */ } },
-  { "reml",	emit_division, "__reml",
-    { MACRO_IR, MACRO_IR, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_IR, MACRO_EOA,
-      /* MACRO_IR, MACRO_EXP, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_EXP, MACRO_EOA */ } },
-  { "remlu",	emit_division, "__remlu",
-    { MACRO_IR, MACRO_IR, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_IR, MACRO_EOA,
-      /* MACRO_IR, MACRO_EXP, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_EXP, MACRO_EOA */ } },
-  { "remq",	emit_division, "__remq",
-    { MACRO_IR, MACRO_IR, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_IR, MACRO_EOA,
-      /* MACRO_IR, MACRO_EXP, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_EXP, MACRO_EOA */ } },
-  { "remqu",	emit_division, "__remqu",
-    { MACRO_IR, MACRO_IR, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_IR, MACRO_EOA,
-      /* MACRO_IR, MACRO_EXP, MACRO_IR, MACRO_EOA,
-      MACRO_IR, MACRO_EXP, MACRO_EOA */ } },
+      MACRO_IR, MACRO_IR, MACRO_EOA, } },
 
   { "jsr",	emit_jsrjmp, "jsr",
     { MACRO_PIR, MACRO_EXP, MACRO_EOA,
@@ -3073,6 +2952,23 @@ find_macro_match (const struct alpha_macro *first_macro,
   return NULL;
 }
 
+/* Sets the control bits in the current control word */
+static void
+set_control_bits(int bits)
+{
+  int offset;
+
+  if (control_word_ptr == NULL || function_offset < 8)
+    {
+      as_bad (_("invalid control instruction location"));
+      return;
+    }
+
+  offset = ((function_offset - 4) % 64) / 4 * 2;
+  control_word |= bits << offset;
+  md_number_to_chars (control_word_ptr, control_word, 4);
+}
+
 /* Given an opcode name and a pre-tokenized set of arguments, take the
    opcode all the way through emission.  */
 
@@ -3111,6 +3007,18 @@ assemble_tokens (const char *opname,
 	      return;
 	    }
 	}
+    }
+
+  /* Special case for Switch and kill in uTA */
+  if (strcmp(opname, "swch") == 0 && ntok == 0)
+    {
+      set_control_bits (1);
+      return;
+    }
+  if (strcmp(opname, "end") == 0 && ntok == 0)
+    {
+      set_control_bits (3);
+      return;
     }
 
   /* Search opcodes.  */
@@ -3426,6 +3334,9 @@ s_alpha_section (int ignore ATTRIBUTE_UNUSED)
 static void
 s_alpha_ent (int dummy ATTRIBUTE_UNUSED)
 {
+  alpha_align(6, NULL, alpha_insn_label, 0);
+  function_offset = 0;
+
   if (ECOFF_DEBUGGING)
     ecoff_directive_ent (0);
   else
@@ -3471,6 +3382,9 @@ s_alpha_ent (int dummy ATTRIBUTE_UNUSED)
 	  if (ISDIGIT (*input_line_pointer) || *input_line_pointer == '-')
 	    (void) get_absolute_expression ();
 	}
+      /* Invalidate current .registers directive */
+      register_counts.valid = 0;
+
       demand_empty_rest_of_line ();
     }
 }
@@ -3615,6 +3529,47 @@ s_alpha_frame (int dummy ATTRIBUTE_UNUSED)
 }
 
 static void
+s_alpha_registers(int dummy ATTRIBUTE_UNUSED)
+{
+  int i, arg = 0;
+  struct register_counts counts;
+  int* args[6] = {
+    &counts.ints.global, &counts.ints.shared, &counts.ints.local,
+    &counts.flts.global, &counts.flts.shared, &counts.flts.local};
+
+  /* Read the arguments and compose single word */
+  for (i = 0; i < 6; i++)
+    {
+      *args[i] = get_absolute_expression ();
+      if (*args[i] > 31)
+        {
+          as_bad(_("invalid .registers argument"));
+          return;
+        }
+      arg |= *args[i] << ((i % 3) * 5 + (i / 3) * 16);
+    }
+  demand_empty_rest_of_line ();
+
+  /* Validate arguments */
+  if (counts.ints.global + 2 * counts.ints.shared + counts.ints.local > 31 ||
+      counts.flts.global + 2 * counts.flts.shared + counts.flts.local > 31)
+    {
+      as_bad(_("invalid .registers arguments"));
+      return;
+    }
+  counts.valid = 1;
+
+  /* .registers directive always starts a cache-line */
+  alpha_align (6, NULL, alpha_insn_label, 0);
+  emit_control_word(frag_more(4));
+  md_number_to_chars(frag_more(4), arg, 4);
+  function_offset += 8;
+
+  /* Update global current register counts */
+  register_counts = counts;
+}
+
+static void
 s_alpha_prologue (int ignore ATTRIBUTE_UNUSED)
 {
   symbolS *sym;
@@ -3748,7 +3703,7 @@ s_alpha_coff_wrapper (int which)
    unless the compiler has done it for us.  */
 
 void
-alpha_elf_md_end (void)
+mtalpha_elf_md_end (void)
 {
   struct alpha_elf_frame_data *p;
 
@@ -3878,7 +3833,7 @@ s_alpha_usepv (int unused ATTRIBUTE_UNUSED)
 /* Standard calling conventions leaves the CFA at $30 on entry.  */
 
 void
-alpha_cfi_frame_initial_instructions (void)
+mtalpha_cfi_frame_initial_instructions (void)
 {
   cfi_add_CFA_def_cfa_register (30);
 }
@@ -4457,6 +4412,67 @@ s_alpha_base (int ignore ATTRIBUTE_UNUSED)
 {
   SKIP_WHITESPACE ();
 
+  if (register_counts.valid)
+    {
+      /* Demand $rNN form */
+      if (*input_line_pointer++ != '$')
+        {
+          as_bad(_("Bad base register"));
+        }
+      else
+        {
+          char type = 0;
+          switch (*input_line_pointer)
+            {
+            case 'l': case 'g': case 'd': case 's':
+              type = *input_line_pointer++;
+              break;
+            }
+            
+          if (*input_line_pointer == 'r')
+            input_line_pointer++;
+            
+          alpha_gp_register = get_absolute_expression ();
+          if (alpha_gp_register < 0 || alpha_gp_register > 31)
+            {
+              as_bad (_("Bad base register"));
+            }
+          else if (type != 0)
+            {
+              int base = 0, count = 32;
+              switch (type)
+                {
+                case 'd':
+                  base = register_counts.ints.global + register_counts.ints.shared + register_counts.ints.local;
+                  count = register_counts.ints.shared;
+                  break;
+
+                case 'l':
+                  base = 0;
+                  count = register_counts.ints.local;
+                  break;
+
+                case 's':
+                  base = register_counts.ints.local + register_counts.ints.global;
+                  count = register_counts.ints.shared;
+                  break;
+
+                case 'g':
+                  base = register_counts.ints.local;
+                  count = register_counts.ints.global;
+                  break;
+                }
+                
+              if (alpha_gp_register >= count)
+                {
+                  as_bad(_("Bad base register"));
+                }
+              alpha_gp_register += base;
+            }
+        }
+    }
+  else
+    {
   if (*input_line_pointer == '$')
     {
       /* $rNN form.  */
@@ -4470,6 +4486,7 @@ s_alpha_base (int ignore ATTRIBUTE_UNUSED)
     {
       alpha_gp_register = AXP_REG_GP;
       as_warn (_("Bad base register, using $%d."), alpha_gp_register);
+    }
     }
 
   demand_empty_rest_of_line ();
@@ -4543,7 +4560,7 @@ s_alpha_space (int ignore)
 /* Hook into cons for auto-alignment.  */
 
 void
-alpha_cons_align (int size)
+mtalpha_cons_align (int size)
 {
   int log_size;
 
@@ -4713,6 +4730,9 @@ const pseudo_typeS md_pseudo_table[] =
   {"skip", s_alpha_space, 0},
   {"zero", s_alpha_space, 0},
 
+  /* Microthread registers word */
+  {"registers", s_alpha_registers, 0},
+
 /* Unaligned data pseudos.  */
   {"uword", s_alpha_ucons, 2},
   {"ulong", s_alpha_ucons, 4},
@@ -4781,7 +4801,7 @@ select_gp_value (void)
 /* Map 's' to SHF_ALPHA_GPREL.  */
 
 int
-alpha_elf_section_letter (int letter, char **ptr_msg)
+mtalpha_elf_section_letter (int letter, char **ptr_msg)
 {
   if (letter == 's')
     return SHF_ALPHA_GPREL;
@@ -4793,7 +4813,7 @@ alpha_elf_section_letter (int letter, char **ptr_msg)
 /* Map SHF_ALPHA_GPREL to SEC_SMALL_DATA.  */
 
 flagword
-alpha_elf_section_flags (flagword flags, int attr, int type ATTRIBUTE_UNUSED)
+mtalpha_elf_section_flags (flagword flags, int attr, int type ATTRIBUTE_UNUSED)
 {
   if (attr & SHF_ALPHA_GPREL)
     flags |= SEC_SMALL_DATA;
@@ -4805,7 +4825,7 @@ alpha_elf_section_flags (flagword flags, int attr, int type ATTRIBUTE_UNUSED)
    of an rs_align_code fragment.  */
 
 void
-alpha_handle_align (fragS *fragp)
+mtalpha_handle_align (fragS *fragp)
 {
   static char const unop[4] = { 0x00, 0x00, 0xfe, 0x2f };
   static char const nopunop[8] =
@@ -4868,12 +4888,12 @@ md_begin (void)
   /* Create the opcode hash table.  */
   alpha_opcode_hash = hash_new ();
 
-  for (i = 0; i < alpha_num_opcodes;)
+  for (i = 0; i < mtalpha_num_opcodes;)
     {
       const char *name, *retval, *slash;
 
-      name = alpha_opcodes[i].name;
-      retval = hash_insert (alpha_opcode_hash, name, (void *) &alpha_opcodes[i]);
+      name = mtalpha_opcodes[i].name;
+      retval = hash_insert (alpha_opcode_hash, name, (void *) &mtalpha_opcodes[i]);
       if (retval)
 	as_fatal (_("internal error: can't hash opcode `%s': %s"),
 		  name, retval);
@@ -4890,14 +4910,14 @@ md_begin (void)
 	  memcpy (p, name, slash - name);
 	  strcpy (p + (slash - name), slash + 1);
 
-	  (void) hash_insert (alpha_opcode_hash, p, (void *) &alpha_opcodes[i]);
+	  (void) hash_insert (alpha_opcode_hash, p, (void *) &mtalpha_opcodes[i]);
 	  /* Ignore failures -- the opcode table does duplicate some
 	     variants in different forms, like "hw_stq" and "hw_st/q".  */
 	}
 
-      while (++i < alpha_num_opcodes
-	     && (alpha_opcodes[i].name == name
-		 || !strcmp (alpha_opcodes[i].name, name)))
+      while (++i < mtalpha_num_opcodes
+	     && (mtalpha_opcodes[i].name == name
+		 || !strcmp (mtalpha_opcodes[i].name, name)))
 	continue;
     }
 
@@ -5346,8 +5366,8 @@ md_apply_fix (fixS *fixP, valueT * valP, segT seg)
 	  as_fatal (_("unhandled relocation type %s"),
 		    bfd_get_reloc_code_name (fixP->fx_r_type));
 
-	assert (-(int) fixP->fx_r_type < (int) alpha_num_operands);
-	operand = &alpha_operands[-(int) fixP->fx_r_type];
+	assert (-(int) fixP->fx_r_type < (int) mtalpha_num_operands);
+	operand = &mtalpha_operands[-(int) fixP->fx_r_type];
 
 	/* The rest of these fixups only exist internally during symbol
 	   resolution and have no representation in the object file.
@@ -5389,13 +5409,26 @@ md_undefined_symbol (char *name)
   if (*name == '$')
     {
       int is_float = 0, num;
+      char type = 0;
+      const struct register_count* counts = &register_counts.ints;
 
       switch (*++name)
 	{
+       case 'l': case 'g': case 's': case 'd':
+           if (register_counts.valid)
+             {
+            type = *name++;
+          }
+        break;
+    }
+
+         switch(*name)
+       {
 	case 'f':
-	  if (name[1] == 'p' && name[2] == '\0')
+	  if (type == 0 && name[1] == 'p' && name[2] == '\0')
 	    return alpha_register_table[AXP_REG_FP];
 	  is_float = 32;
+      counts   = &register_counts.flts;
 	  /* Fall through.  */
 
 	case 'r':
@@ -5416,12 +5449,43 @@ md_undefined_symbol (char *name)
 	  else
 	    break;
 
+      if (counts != NULL && type != 0)
+        {
+          int base = 0, count = 32;
+             switch (type)
+             {
+               case 'd':
+                 base = counts->global + counts->shared + counts->local;
+                 count = counts->shared;
+                 break;
+
+               case 'l':
+                 base = 0;
+                 count = counts->local;
+                 break;
+
+               case 's':
+                 base = counts->global + counts->local;
+                 count = counts->shared;
+                 break;
+
+               case 'g':
+                 base = counts->local;
+                 count = counts->global;
+                 break;
+        }
+      if (num >= count)
+          break;
+      num += base;
+        }
+
 	  if (!alpha_noat_on && (num + is_float) == AXP_REG_AT)
 	    as_warn (_("Used $at without \".set noat\""));
+
 	  return alpha_register_table[num + is_float];
 
 	case 'a':
-	  if (name[1] == 't' && name[2] == '\0')
+	  if (type == 0 && name[1] == 't' && name[2] == '\0')
 	    {
 	      if (!alpha_noat_on)
 		as_warn (_("Used $at without \".set noat\""));
@@ -5430,12 +5494,12 @@ md_undefined_symbol (char *name)
 	  break;
 
 	case 'g':
-	  if (name[1] == 'p' && name[2] == '\0')
+	  if (type == 0 && name[1] == 'p' && name[2] == '\0')
 	    return alpha_register_table[alpha_gp_register];
 	  break;
 
 	case 's':
-	  if (name[1] == 'p' && name[2] == '\0')
+	  if (type == 0 && name[1] == 'p' && name[2] == '\0')
 	    return alpha_register_table[AXP_REG_SP];
 	  break;
 	}
@@ -5461,7 +5525,7 @@ alpha_frob_ecoff_data (void)
    required.  */
 
 void
-alpha_define_label (symbolS *sym)
+mtalpha_define_label (symbolS *sym)
 {
   alpha_insn_label = sym;
 #ifdef OBJ_ELF
@@ -5473,7 +5537,7 @@ alpha_define_label (symbolS *sym)
    there is some hope of resolving it at assembly time.  */
 
 int
-alpha_force_relocation (fixS *f)
+mtalpha_force_relocation (fixS *f)
 {
   if (alpha_flag_relax)
     return 1;
@@ -5515,7 +5579,7 @@ alpha_force_relocation (fixS *f)
 /* Return true if we can partially resolve a relocation now.  */
 
 int
-alpha_fix_adjustable (fixS *f)
+mtalpha_fix_adjustable (fixS *f)
 {
   /* Are there any relocation types for which we must generate a
      reloc but we can adjust the values contained within it?   */
