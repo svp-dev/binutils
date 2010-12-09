@@ -1,0 +1,7 @@
+Note: there might be a bug with Autoconf 2.68 which
+causes the configure script in src/libiberty to be 
+incorrectly generated.
+
+Autoconf 2.63 is known to work properly. You can
+use the env var AUTORECONF with the "bootstrap" script
+to force a different version of Autoreconf.
