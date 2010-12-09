@@ -1,4 +1,4 @@
-/* tc-sparc.c -- Assemble for the SPARC
+/* tc-mtsparc.c -- Assemble for the Microthread SPARC
    Copyright 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
    1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
    Free Software Foundation, Inc.
@@ -112,6 +112,9 @@ extern int target_big_endian;
 
 static int target_little_endian_data;
 
+/* Label pointing to current instruction */
+static symbolS* mtsparc_insn_label = NULL;
+
 /* Symbols for global registers on v9.  */
 static symbolS *globals[8];
 
@@ -136,32 +139,72 @@ static void s_data1 PARAMS ((void));
 static void s_seg PARAMS ((int));
 static void s_proc PARAMS ((int));
 static void s_reserve PARAMS ((int));
+static void s_registers PARAMS ((int));
 static void s_common PARAMS ((int));
 static void s_empty PARAMS ((int));
 static void s_uacons PARAMS ((int));
 static void s_ncons PARAMS ((int));
+static void s_mtsparc_text PARAMS ((int));
+static void s_mtsparc_data PARAMS ((int));
+static void s_mtsparc_section PARAMS ((int));
+static void s_mtsparc_float_cons PARAMS ((int));
+static void s_mtsparc_stringer PARAMS ((int));
+static void s_mtsparc_space PARAMS ((int));
+
 #ifdef OBJ_ELF
 static void s_register PARAMS ((int));
 #endif
 
+/* The current location and value of the control word (Microthread specific) */
+static char*         control_word_ptr = NULL;
+static unsigned long control_word     = 0;
+static addressT      function_offset  = 0;
+
+struct register_count
+{
+    int global, local, shared;
+};
+
+struct register_counts
+{
+    int valid;
+    struct register_count ints, flts;
+};
+
+/* The current register counts */
+static struct register_counts register_counts = {0, {0,0,0}, {0,0,0}};
+
 const pseudo_typeS md_pseudo_table[] =
 {
   {"align", s_align_bytes, 0},	/* Defaulting is invalid (0).  */
+  {"ascii", s_mtsparc_stringer, 0},
+  {"asciz", s_mtsparc_stringer, 1},
   {"common", s_common, 0},
+  {"data", s_mtsparc_data, 0},
+  {"double", s_mtsparc_float_cons, 'd'},
   {"empty", s_empty, 0},
+  {"float", s_mtsparc_float_cons, 'f'},
   {"global", s_globl, 0},
   {"half", cons, 2},
   {"nword", s_ncons, 0},
   {"optim", s_ignore, 0},
   {"proc", s_proc, 0},
+  {"registers", s_registers, 0},
   {"reserve", s_reserve, 0},
+  {"section", s_mtsparc_section, 0},
+  {"section.s", s_mtsparc_section, 0},
   {"seg", s_seg, 0},
-  {"skip", s_space, 0},
+  {"single", s_mtsparc_float_cons, 'f'},
+  {"skip", s_mtsparc_space, 0},
+  {"space", s_mtsparc_space, 0},
+  {"string", s_mtsparc_stringer, 1},
+  {"text", s_mtsparc_text, 0},
   {"word", cons, 4},
   {"xword", cons, 8},
   {"uahalf", s_uacons, 2},
   {"uaword", s_uacons, 4},
   {"uaxword", s_uacons, 8},
+  {"zero", s_mtsparc_space, 0},
 #ifdef OBJ_ELF
   /* These are specific to sparc/svr4.  */
   {"2byte", s_uacons, 2},
@@ -1304,6 +1347,37 @@ synthetize_setx (insn)
     }
 }
 
+
+static void
+emit_control_word(char* f)
+{
+  control_word_ptr = f;
+  control_word     = 0;
+  md_number_to_chars (f, control_word, 4);
+  if (mtsparc_insn_label != NULL)
+    {
+      /* Adjust label so it points to the data following the control word */
+      symbol_set_value_now (mtsparc_insn_label);
+    }
+}
+
+/* Sets the control bits in the current control word */
+static void
+set_control_bits(int bits)
+{
+  int offset;
+
+  if (control_word_ptr == NULL || function_offset < 8)
+    {
+      as_bad (_("invalid control instruction location"));
+      return;
+    }
+
+  offset = ((function_offset - 4) % 64) / 4 * 2;
+  control_word |= bits << offset;
+  md_number_to_chars (control_word_ptr, control_word, 4);
+}
+                              
 /* Main entry point to assemble one instruction.  */
 
 void
@@ -1312,6 +1386,18 @@ md_assemble (str)
 {
   const struct sparc_opcode *insn;
   int special_case;
+
+  /* Special case for Switch and kill in uTA */
+  if (strcmp(str, "swch") == 0)
+    {
+      set_control_bits (1);
+      return;
+    }
+  if (strcmp(str, "end") == 0)
+    {
+      set_control_bits (3);
+      return;
+    }
 
   know (str);
   special_case = sparc_ip (str, &insn);
@@ -2039,9 +2125,45 @@ sparc_ip (str, pinsn)
 			}
 		      goto error;
 
+			case 'd':	/* dependent register */
+		      if (register_counts.valid)
+			{
+			  if (ISDIGIT(c = *s++))
+			  {
+			    c -= '0';
+		        if (ISDIGIT (*s)) {
+			   	    c = 10 * c + (*s++ - '0');
+				}
+		   	    if (c >= register_counts.ints.shared) {
+		      	  goto error;
+		    	}
+		    	c = register_counts.ints.shared - 1 - c;
+		      	mask = 31 - (c + register_counts.ints.global +
+		      		register_counts.ints.shared + register_counts.ints.local);
+		      	break;
+		      }
+			}
+  	        goto error;
+			
 		    case 'g':	/* global register */
 		      c = *s++;
-		      if (isoctal (c))
+		    if (register_counts.valid)
+			{
+			  if (ISDIGIT(c))
+			  {
+  			  	c -= '0';
+		      	if (ISDIGIT (*s)) {
+			      c = 10 * c + (*s++ - '0');
+			    }
+		  	  	if (c >= register_counts.ints.global) {
+		          goto error;
+		        }
+		        c = register_counts.ints.global - 1 - c;
+		        mask = 31 - c;
+		        break;
+		      }
+			}
+		    else if (isoctal (c))
 			{
 			  mask = c - '0';
 			  break;
@@ -2059,7 +2181,23 @@ sparc_ip (str, pinsn)
 
 		    case 'l':	/* local register */
 		      c = *s++;
-		      if (isoctal (c))
+		    if (register_counts.valid)
+			{
+			  if (ISDIGIT(c))
+			  {
+			  	c -= '0';
+		     	if (ISDIGIT (*s)) {
+			  	  c = 10 * c + (*s++ - '0');
+				}
+		  	  	if (c >= register_counts.ints.local) {
+		      	  goto error;
+		    	}
+		      	c = register_counts.ints.local - 1 - c;
+		      	mask = 31 - (c + register_counts.ints.global + register_counts.ints.shared);
+		      	break;
+			  }
+			}
+		    else if (isoctal (c))
 			{
 			  mask = (c - '0' + 16);
 			  break;
@@ -2076,10 +2214,26 @@ sparc_ip (str, pinsn)
 		      goto error;
 
 		    case 's':	/* stack pointer */
-		      if (*s++ == 'p')
+		    if ((c = *s++) == 'p')
 			{
 			  mask = 0xe;
 			  break;
+			}
+		    else if (register_counts.valid)
+			{
+			  if (ISDIGIT(c))
+			  {
+			  	c -= '0';
+		      	if (ISDIGIT (*s)) {
+			  	  c = 10 * c + (*s++ - '0');
+				}
+		  	  	if (c >= register_counts.ints.shared) {
+		      	  goto error;
+		    	}
+		    	c = register_counts.ints.shared - 1 - c;
+		      	mask = 31 - (c + register_counts.ints.global);
+		      	break;
+			  }
 			}
 		      goto error;
 
@@ -2163,18 +2317,50 @@ sparc_ip (str, pinsn)
 		char format;
 
 		if (*s++ == '%'
-		    && ((format = *s) == 'f')
+		    && (((format = *s) == 'f') ||
+		      (register_counts.valid && ((format = *s) == 'l' || *s == 's' || *s == 'g' || *s == 'd') && *++s == 'f'))
 		    && ISDIGIT (*++s))
 		  {
+		    unsigned int base, count;
+		    
 		    for (mask = 0; ISDIGIT (*s); ++s)
 		      {
 			mask = 10 * mask + (*s - '0');
 		      }		/* read the number */
 
+			switch (format)
+			{
+			case 's':
+			  	count = register_counts.flts.shared;
+			   	base  = register_counts.flts.global;
+			   	break;
+			case 'd':
+			  	count = register_counts.flts.shared;
+			   	base  = register_counts.flts.global + register_counts.flts.shared + register_counts.flts.local;
+			  	break;
+			case 'g':
+			   	count = register_counts.flts.global;
+			   	base  = 0;
+			   	break;
+			case 'l':
+			   	count = register_counts.flts.local;
+			   	base  = register_counts.flts.global + register_counts.flts.shared;
+			   	break;
+			default:
+			    count = 1024;  /* Just a very high number */
+			    base  = 0;
+				break;
+			}
+		    
+		    if (mask >= count)
+			{
+			    break;
+			}
+			
 		    if ((*args == 'v'
 			 || *args == 'B'
 			 || *args == 'H')
-			&& (mask & 1))
+			&& ((mask & 1) || (mask + 2 > count)))
 		      {
 			break;
 		      }		/* register must be even numbered */
@@ -2182,11 +2368,19 @@ sparc_ip (str, pinsn)
 		    if ((*args == 'V'
 			 || *args == 'R'
 			 || *args == 'J')
-			&& (mask & 3))
+			&& ((mask & 3) || (mask + 4 > count)))
 		      {
 			break;
 		      }		/* register must be multiple of 4 */
 
+			if (count != 1024) {
+			    /* uThread registers (LSGD) have to be reversed */
+			    mask = 31 - (count - 1 - mask + base);
+			} else {
+			    mask = mask + base;
+			}
+			format = 'f';			
+	        
 		    if (mask >= 64)
 		      {
 			if (SPARC_OPCODE_ARCH_V9_P (max_architecture))
@@ -2252,6 +2446,10 @@ sparc_ip (str, pinsn)
 		  continue;
 		}
 	      break;
+
+        case '<':
+        case '>':       /* 5-bit immediate, no relocations */
+          goto immediate;
 
 	    case '0':		/* 64 bit immediate (set, setsw, setx insn)  */
 	      the_insn.reloc = BFD_RELOC_NONE; /* reloc handled elsewhere  */
@@ -2545,6 +2743,12 @@ sparc_ip (str, pinsn)
 		     all the various cases (e.g. in md_apply_fix and
 		     bfd_install_relocation) so duplicating all that code
 		     here isn't right.  */
+          switch (*args)
+          {
+            /* 5-bit immediate into rs2 or rd field */
+            case '<': opcode |= (the_insn.exp.X_add_number & 0x1f) << 0; break;
+            case '>': opcode |= (the_insn.exp.X_add_number & 0x1f) << 25; break;
+          }
 		}
 
 	      continue;
@@ -2912,13 +3116,24 @@ output_insn (insn, the_insn)
      const struct sparc_opcode *insn;
      struct sparc_it *the_insn;
 {
-  char *toP = frag_more (4);
+  char *toP;
+
+  if ((function_offset % 64) == 0)
+  {
+     /* Output the control word first */
+     emit_control_word (frag_more (4));
+     function_offset += 4;
+  }
+
+  toP = frag_more (4);
 
   /* Put out the opcode.  */
   if (INSN_BIG_ENDIAN)
     number_to_chars_bigendian (toP, (valueT) the_insn->opcode, 4);
   else
     number_to_chars_littleendian (toP, (valueT) the_insn->opcode, 4);
+  function_offset += 4;
+  mtsparc_insn_label = NULL;
 
   /* Put out the symbol-dependent stuff.  */
   if (the_insn->reloc != BFD_RELOC_NONE)
@@ -3736,6 +3951,51 @@ mylog2 (value)
 static int max_alignment = 15;
 #endif
 
+/* Defined in read.c */
+extern void do_align (int, char *, int, int);
+
+static void
+s_registers(ignore)
+     int ignore ATTRIBUTE_UNUSED;
+{
+  int i, arg = 0;
+  struct register_counts counts;
+  int* args[6] = {
+    &counts.ints.global, &counts.ints.shared, &counts.ints.local,
+    &counts.flts.global, &counts.flts.shared, &counts.flts.local};
+
+  /* Read the arguments and compose single word */
+  for (i = 0; i < 6; i++)
+    {
+      *args[i] = get_absolute_expression ();
+      if (*args[i] > 31)
+        {
+          as_bad(_("invalid .registers argument"));
+          return;
+        }
+      arg |= *args[i] << ((i % 3) * 5 + (i / 3) * 16);
+    }
+  demand_empty_rest_of_line ();
+
+  /* Validate arguments */
+  if (counts.ints.global + 2 * counts.ints.shared + counts.ints.local > 31 ||
+      counts.flts.global + 2 * counts.flts.shared + counts.flts.local > 31)
+    {
+      as_bad(_("invalid .registers arguments"));
+      return;
+    }
+  counts.valid = 1;
+
+  /* .registers directive always starts a cache-line */
+  do_align (6, (char *) NULL, 0, 0);
+  emit_control_word(frag_more(4));
+  md_number_to_chars(frag_more(4), arg, 4);
+  function_offset += 8;
+
+  /* Update global current register counts */
+  register_counts = counts;
+}
+
 static void
 s_reserve (ignore)
      int ignore ATTRIBUTE_UNUSED;
@@ -4058,6 +4318,84 @@ s_common (ignore)
   }
 }
 
+/* Handle the .text pseudo-op.  This is like the usual one, but it
+   clears mtsparc_insn_label */
+
+static void
+s_mtsparc_text (int i)
+{
+#if defined(OBJ_ELF)
+  obj_elf_text (i);
+#elif defined(OBJ_COFF)
+  obj_coff_text (i);
+#else
+  s_text (i);
+#endif
+  mtsparc_insn_label = NULL;
+}
+
+/* Handle the .data pseudo-op.  This is like the usual one, but it
+   clears mtsparc_insn_label */
+
+static void
+s_mtsparc_data (int i)
+{
+#if defined(OBJ_ELF)
+  obj_elf_data (i);
+#elif defined(OBJ_COFF)
+  obj_coff_data (i);
+#else
+  s_data (i);
+#endif
+  mtsparc_insn_label = NULL;
+}
+
+/* Handle the .section pseudo-op.  This is like the usual one, but it
+   clears mtsparc_insn_label */
+
+static void
+s_mtsparc_section (int i)
+{
+#if defined(OBJ_ELF)
+  obj_elf_section (i);
+#elif defined(OBJ_COFF)
+  obj_coff_section (i);
+#else
+  s_section (i);
+#endif
+  mtsparc_insn_label = NULL;
+}
+
+/* Handle the space pseudo-ops.  This is like the usual one, but it
+   clears mtsparc_insn_label */
+
+static void
+s_mtsparc_space (int i)
+{
+  mtsparc_insn_label = NULL;
+  s_space (i);
+}
+
+/* Handle the float pseudo-ops.  This is like the usual one, but it
+   clears mtsparc_insn_label */
+
+static void
+s_mtsparc_float_cons (int i)
+{
+  mtsparc_insn_label = NULL;
+  float_cons (i);
+}
+
+/* Handle the string pseudo-ops.  This is like the usual one, but it
+   clears mtsparc_insn_label */
+
+static void
+s_mtsparc_stringer (int i)
+{
+  mtsparc_insn_label = NULL;
+  stringer (i);
+}
+
 /* Handle the .empty pseudo-op.  This suppresses the warnings about
    invalid delay slot usage.  */
 
@@ -4276,6 +4614,16 @@ sparc_adjust_symtab ()
 }
 #endif
 
+/* This function gets called by read.c on alignments */
+int
+mtsparc_do_align (int n, const char * fill ATTRIBUTE_UNUSED, int len ATTRIBUTE_UNUSED, int max ATTRIBUTE_UNUSED)
+{
+  /* Since we independently keep track of the in-function offset - * we need to advance it manually */
+  function_offset += ((1 << n) - (function_offset % (1 << n))) % (1 << n);
+  return 0;
+}
+
+
 /* If the --enforce-aligned-data option is used, we require .word,
    et. al., to be aligned correctly.  We do it by setting up an
    rs_align_code frag, and checking in HANDLE_ALIGN to make sure that
@@ -4293,6 +4641,9 @@ sparc_cons_align (nbytes)
 {
   int nalign;
   char *p;
+
+  /* Reset instruction label */
+  mtsparc_insn_label = NULL;
 
   /* Only do this if we are enforcing aligned data.  */
   if (! enforce_aligned_data)
@@ -4331,6 +4682,10 @@ sparc_handle_align (fragp)
   char *p;
 
   count = fragp->fr_next->fr_address - fragp->fr_address - fragp->fr_fix;
+
+  /* Since we independently keep track of the in-function offset
+   * we need to advance it manually */
+  function_offset += count;
 
   switch (fragp->fr_type)
     {
@@ -4664,3 +5019,9 @@ sparc_cfi_emit_pcrel_expr (expressionS *exp, unsigned int nbytes)
   sparc_no_align_cons = 0;
   sparc_cons_special_reloc = NULL;
 }
+
+void mtsparc_define_label (symbolS * s)
+{
+  mtsparc_insn_label = s;
+}
+

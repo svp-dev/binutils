@@ -1,4 +1,4 @@
-/* tc-sparc.h - Macros and type defines for the sparc.
+/* tc-mtsparc.h - Macros and type defines for the Microthread sparc.
    Copyright 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
    1999, 2000, 2001, 2002, 2003, 2005, 2007
    Free Software Foundation, Inc.
@@ -20,8 +20,8 @@
    to the Free Software Foundation, 51 Franklin Street - Fifth Floor,
    Boston, MA 02110-1301, USA.  */
 
-#ifndef TC_SPARC
-#define TC_SPARC 1
+#ifndef TC_MTSPARC
+#define TC_MTSPARC 1
 
 struct frag;
 
@@ -30,19 +30,19 @@ struct frag;
 
 #define LOCAL_LABELS_FB 1
 
-#define TARGET_ARCH bfd_arch_sparc
+#define TARGET_ARCH bfd_arch_mtsparc
 
 #ifdef TE_FreeBSD
-#define ELF_TARGET_FORMAT	"elf32-sparc-freebsd"
-#define ELF64_TARGET_FORMAT	"elf64-sparc-freebsd"
+#define ELF_TARGET_FORMAT	"elf32-mtsparc-freebsd"
+#define ELF64_TARGET_FORMAT	"elf64-mtsparc-freebsd"
 #endif
 
 #ifndef ELF_TARGET_FORMAT
-#define ELF_TARGET_FORMAT	"elf32-sparc"
+#define ELF_TARGET_FORMAT	"elf32-mtsparc"
 #endif
 
 #ifndef ELF64_TARGET_FORMAT
-#define ELF64_TARGET_FORMAT	"elf64-sparc"
+#define ELF64_TARGET_FORMAT	"elf64-mtsparc"
 #endif
 
 extern const char *sparc_target_format PARAMS ((void));
@@ -55,6 +55,10 @@ extern const char *sparc_target_format PARAMS ((void));
 #define SPARC_BIENDIAN
 
 #define WORKING_DOT_WORD
+
+extern int mtsparc_do_align PARAMS ((int, const char *, int, int));
+#define md_do_align(N, FILL, LEN, MAX, LABEL) \
+  if (mtsparc_do_align(N, FILL, LEN, MAX)) goto LABEL;
 
 #define md_convert_frag(b,s,f) \
   as_fatal (_("sparc convert_frag\n"))
@@ -191,8 +195,11 @@ extern void sparc_cfi_emit_pcrel_expr PARAMS ((expressionS *, unsigned int));
 
 extern int sparc_cie_data_alignment;
 
+#define tc_frob_label(sym) mtsparc_define_label (sym)
+extern void mtsparc_define_label (symbolS *);
+
 #define DWARF2_LINE_MIN_INSN_LENGTH     4
 #define DWARF2_DEFAULT_RETURN_COLUMN    15
 #define DWARF2_CIE_DATA_ALIGNMENT       sparc_cie_data_alignment
 
-/* end of tc-sparc.h */
+/* end of tc-mtsparc.h */
