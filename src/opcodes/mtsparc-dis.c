@@ -1,4 +1,4 @@
-/* Print SPARC instructions.
+/* Print Microthread SPARC instructions.
    Copyright 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
    2000, 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
 
@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 #include "sysdep.h"
-#include "opcode/sparc.h"
+#include "opcode/mtsparc.h"
 #include "dis-asm.h"
 #include "libiberty.h"
 #include "opintl.h"
@@ -450,7 +450,7 @@ build_hash_table (const sparc_opcode **opcode_table,
    on that register.  */
 
 int
-print_insn_sparc (bfd_vma memaddr, disassemble_info *info)
+print_insn_mtsparc (bfd_vma memaddr, disassemble_info *info)
 {
   FILE *stream = info->stream;
   bfd_byte buffer[4];
@@ -856,6 +856,11 @@ print_insn_sparc (bfd_vma memaddr, disassemble_info *info)
 		    (*info->fprintf_func)
 		      (stream, "%#x", SEX (X_DISP22 (insn), 22));
 		    break;
+
+		  case '{': (*info->fprintf_func)(stream, "%#x", (insn >>  0) & 0x1f); break;
+		  case '}': (*info->fprintf_func)(stream, "%#x", (insn >>  5) & 0x1f); break;
+		  case '<': (*info->fprintf_func)(stream, "%#x", (insn >> 10) & 0x1f); break;
+		  case '>': (*info->fprintf_func)(stream, "%#x", (insn >> 15) & 0x1f); break;
 
 		  case 'l':
 		    info->target = memaddr + SEX (X_DISP22 (insn), 22) * 4;

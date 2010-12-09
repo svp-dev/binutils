@@ -1,4 +1,4 @@
-/* Table of opcodes for the sparc.
+/* Table of opcodes for the Microthread sparc.
    Copyright 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
    2000, 2002, 2004, 2005, 2007
    Free Software Foundation, Inc.
@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 #include "sysdep.h"
-#include "opcode/sparc.h"
+#include "opcode/mtsparc.h"
 
 /* Some defines to make life easy.  */
 #define MASK_V6		SPARC_OPCODE_ARCH_MASK (SPARC_OPCODE_ARCH_V6)
@@ -172,7 +172,6 @@ sparc_opcode_lookup_arch (const char *name)
 { opcode,	F3(2, op3, 1), F3(~2, ~op3, ~1),		"i,1,d", 0, arch_mask }
 
 const struct sparc_opcode sparc_opcodes[] = {
-
 { "ld",	F3(3, 0x00, 0), F3(~3, ~0x00, ~0),		"[1+2],d", 0, v6 },
 { "ld",	F3(3, 0x00, 0), F3(~3, ~0x00, ~0)|RS2_G0,	"[1],d", 0, v6 }, /* ld [rs1+%g0],d */
 { "ld",	F3(3, 0x00, 1), F3(~3, ~0x00, ~1),		"[1+i],d", 0, v6 },
@@ -1010,6 +1009,37 @@ const struct sparc_opcode sparc_opcodes[] = {
 { "addccc",	F3(2, 0x18, 1), F3(~2, ~0x18, ~1),		"1,i,d", 0, v9 },
 { "addccc",	F3(2, 0x18, 1), F3(~2, ~0x18, ~1),		"i,1,d", 0, v9 },
 
+{ "allocate", F3(2, 0x09, 0), F3(~2, ~0x09, ~0)|RS1_G0|ASI(~0), "2,d", 0, v6 },
+{ "allocate", F3(2, 0x09, 1), F3(~2, ~0x09, ~1)|RS1_G0,         "i,d", 0, v6 },
+
+{ "setstart",	F3(2, 0x2c, 0), F3(~2, ~0x2c, ~0)|ASI(~0),	"1,2", 0, v6 },
+{ "setstart",	F3(2, 0x2c, 1), F3(~2, ~0x2c, ~1),		    "1,i", 0, v6 },
+{ "setlimit",	F3(2, 0x2d, 0), F3(~2, ~0x2d, ~0)|ASI(~0),	"1,2", 0, v6 },
+{ "setlimit",	F3(2, 0x2d, 1), F3(~2, ~0x2d, ~1),		    "1,i", 0, v6 },
+{ "setstep",	F3(2, 0x2e, 0), F3(~2, ~0x2e, ~0)|ASI(~0),	"1,2", 0, v6 },
+{ "setstep",	F3(2, 0x2e, 1), F3(~2, ~0x2e, ~1),	    	"1,i", 0, v6 },
+{ "setblock",	F3(2, 0x2f, 0), F3(~2, ~0x2f, ~0)|ASI(~0),	"1,2", 0, v6 },
+{ "setblock",	F3(2, 0x2f, 1), F3(~2, ~0x2f, ~1),		    "1,i", 0, v6 },
+{ "print",	    F3(2, 0x37, 0), F3(~2, ~0x37, ~0)|ASI(~0),	"1,2", 0, v6 },
+{ "print",	    F3(2, 0x37, 1), F3(~2, ~0x37, ~1),		    "1,i", 0, v6 },
+{ "ldbp",	    F3(2, 0x3E, 0), F3(~2, ~0x3E, ~0)|RS1_G0|ASI_RS2(~0), "d", 0, v6 }, /* ldbp d */
+{ "ldfp",	    F3(2, 0x3F, 0), F3(~2, ~0x3F, ~0)|RS1_G0|ASI_RS2(~0), "d", 0, v6 }, /* ldfp d */
+
+{ "crei",	F3(2, 0x19, 0), F3(~2, ~0x19, ~0)|ASI(~0),	"1+2,d", 0, v6 },
+{ "crei",	F3(2, 0x19, 0), F3(~2, ~0x19, ~0)|ASI_RS2(~0),	"1,d", 0, v6 }, /* crei rs1+%g0,d */
+{ "crei",	F3(2, 0x19, 1), F3(~2, ~0x19, ~1)|SIMM13(~0),	"1,d", 0, v6 }, /* crei rs1+0,d */
+{ "crei",	F3(2, 0x19, 1), F3(~2, ~0x19, ~1)|RS1_G0,	"i,d", 0, v6 }, /* crei %g0+i,d */
+{ "crei",	F3(2, 0x19, 1), F3(~2, ~0x19, ~1),		"1+i,d", 0, v6 },
+{ "crei",	F3(2, 0x19, 1), F3(~2, ~0x19, ~1),		"i+1,d", 0, v6 },
+
+{ "puts", F3UT(2, 0x36, 0x001), F3UT(~2, ~0x36, ~0x001), "2,1,>", 0, v8 },
+{ "putg", F3UT(2, 0x36, 0x002), F3UT(~2, ~0x36, ~0x002), "2,1,>", 0, v8 },
+{ "gets", F3UT(2, 0x36, 0x003), F3UT(~2, ~0x36, ~0x003), "1,<,d", 0, v8 },
+
+{ "sync",    F3(2, 0x0d, 0), F3(~2, ~0x0d, ~0)|ASI_RS2(~0),       "1,d", 0, v6 },
+{ "detach",  F3(2, 0x1d, 0), F3(~2, ~0x1d, ~0)|ASI_RS2(~0)|RD_G0, "1", 0, v6 },
+{ "release", F3(2, 0x1d, 0), F3(~2, ~0x1d, ~0)|ASI_RS2(~0)|RD_G0, "1", 0, v6 },
+
 { "smul",	F3(2, 0x0b, 0), F3(~2, ~0x0b, ~0)|ASI(~0),	"1,2,d", 0, v8 },
 { "smul",	F3(2, 0x0b, 1), F3(~2, ~0x0b, ~1),		"1,i,d", 0, v8 },
 { "smul",	F3(2, 0x0b, 1), F3(~2, ~0x0b, ~1),		"i,1,d", 0, v8 },
@@ -1451,6 +1481,7 @@ CONDFC  ("fbule", "cb013", 0xe, F_CONDBR),
 { "setsw",	F2(0x0, 0x4), F2(~0x0, ~0x4), "S0,d", F_ALIAS, v9 },
 { "setx",	F2(0x0, 0x4), F2(~0x0, ~0x4), "S0,1,d", F_ALIAS, v9 },
 
+{ "cred",	 F2(0x0, 0x1), F2(~0x0, ~0x1), "l,d", 0, v6 },
 { "sethi",	F2(0x0, 0x4), F2(~0x0, ~0x4), "h,d", 0, v6 },
 
 { "taddcc",	F3(2, 0x20, 0), F3(~2, ~0x20, ~0)|ASI(~0),	"1,2,d", 0, v6 },
@@ -1494,6 +1525,14 @@ CONDFC  ("fbule", "cb013", 0xe, F_CONDBR),
 { "fdtoi",	F3F(2, 0x34, 0x0d2), F3F(~2, ~0x34, ~0x0d2)|RS1_G0, "B,g", F_FLOAT, v6 },
 { "fstoi",	F3F(2, 0x34, 0x0d1), F3F(~2, ~0x34, ~0x0d1)|RS1_G0, "f,g", F_FLOAT, v6 },
 { "fqtoi",	F3F(2, 0x34, 0x0d3), F3F(~2, ~0x34, ~0x0d3)|RS1_G0, "R,g", F_FLOAT, v8 },
+
+{ "fprints", F3F(2, 0x34, 0x002), F3F(~2, ~0x34, ~0x002)|RD_G0, "e,2", F_FLOAT, v8 },
+{ "fprintd", F3F(2, 0x34, 0x003), F3F(~2, ~0x34, ~0x003)|RD_G0, "v,2", F_FLOAT, v8 },
+{ "fprintq", F3F(2, 0x34, 0x004), F3F(~2, ~0x34, ~0x004)|RD_G0, "V,2", F_FLOAT, v8 },
+
+{ "fputs", F3F(2, 0x34, 0x006), F3F(~2, ~0x34, ~0x006), "f,1,>", F_FLOAT, v8 },
+{ "fputg", F3F(2, 0x34, 0x007), F3F(~2, ~0x34, ~0x007), "f,1,>", F_FLOAT, v8 },
+{ "fgets", F3F(2, 0x34, 0x008), F3F(~2, ~0x34, ~0x008), "1,<,g", F_FLOAT, v8 },
 
 { "fdtox",	F3F(2, 0x34, 0x082), F3F(~2, ~0x34, ~0x082)|RS1_G0, "B,H", F_FLOAT, v9 },
 { "fstox",	F3F(2, 0x34, 0x081), F3F(~2, ~0x34, ~0x081)|RS1_G0, "f,H", F_FLOAT, v9 },
