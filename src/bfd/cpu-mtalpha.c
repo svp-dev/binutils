@@ -28,9 +28,9 @@
     BITS_WORD, /* bits in a word */			\
     BITS_ADDR, /* bits in an address */			\
     8,	/* 8 bits in a byte */				\
-    bfd_arch_alpha,					\
+    bfd_arch_mtalpha,					\
     NUMBER,						\
-    "alpha",						\
+    "mtalpha",						\
     PRINT,						\
     3,							\
     DEFAULT,						\
@@ -44,10 +44,10 @@
 /* These exist only so that we can reasonably disassemble PALcode.  */
 static const bfd_arch_info_type arch_info_struct[] =
 {
-  N (64, 64, bfd_mach_alpha_ev4, "alpha:ev4", FALSE, NN(1)),
-  N (64, 64, bfd_mach_alpha_ev5, "alpha:ev5", FALSE, NN(2)),
-  N (64, 64, bfd_mach_alpha_ev6, "alpha:ev6", FALSE, 0),
+  N (64, 64, bfd_mach_mtalpha_ev4, "mtalpha:ev4", FALSE, NN(1)),
+  N (64, 64, bfd_mach_mtalpha_ev5, "mtalpha:ev5", FALSE, NN(2)),
+  N (64, 64, bfd_mach_mtalpha_ev6, "mtalpha:ev6", FALSE, 0),
 };
 
-const bfd_arch_info_type bfd_alpha_arch =
-  N (64, 64, 0, "alpha", TRUE, NN(0));
+const bfd_arch_info_type bfd_mtalpha_arch =
+  N (64, 64, 0, "mtalpha", TRUE, NN(0));

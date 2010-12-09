@@ -36,39 +36,39 @@
 
 /* Prototypes for static functions.  */
 
-static const bfd_target *alpha_ecoff_object_p
+static const bfd_target *mtalpha_ecoff_object_p
   PARAMS ((bfd *));
-static bfd_boolean alpha_ecoff_bad_format_hook
+static bfd_boolean mtalpha_ecoff_bad_format_hook
   PARAMS ((bfd *abfd, PTR filehdr));
-static PTR alpha_ecoff_mkobject_hook
+static PTR mtalpha_ecoff_mkobject_hook
   PARAMS ((bfd *, PTR filehdr, PTR aouthdr));
-static void alpha_ecoff_swap_reloc_in
+static void mtalpha_ecoff_swap_reloc_in
   PARAMS ((bfd *, PTR, struct internal_reloc *));
-static void alpha_ecoff_swap_reloc_out
+static void mtalpha_ecoff_swap_reloc_out
   PARAMS ((bfd *, const struct internal_reloc *, PTR));
-static void alpha_adjust_reloc_in
+static void mtalpha_adjust_reloc_in
   PARAMS ((bfd *, const struct internal_reloc *, arelent *));
-static void alpha_adjust_reloc_out
+static void mtalpha_adjust_reloc_out
   PARAMS ((bfd *, const arelent *, struct internal_reloc *));
-static reloc_howto_type *alpha_bfd_reloc_type_lookup
+static reloc_howto_type *mtalpha_bfd_reloc_type_lookup
   PARAMS ((bfd *, bfd_reloc_code_real_type));
-static bfd_byte *alpha_ecoff_get_relocated_section_contents
+static bfd_byte *mtalpha_ecoff_get_relocated_section_contents
   PARAMS ((bfd *abfd, struct bfd_link_info *, struct bfd_link_order *,
 	   bfd_byte *data, bfd_boolean relocatable, asymbol **symbols));
-static bfd_vma alpha_convert_external_reloc
+static bfd_vma mtalpha_convert_external_reloc
   PARAMS ((bfd *, struct bfd_link_info *, bfd *, struct external_reloc *,
 	   struct ecoff_link_hash_entry *));
-static bfd_boolean alpha_relocate_section
+static bfd_boolean mtalpha_relocate_section
   PARAMS ((bfd *, struct bfd_link_info *, bfd *, asection *, bfd_byte *, PTR));
-static bfd_boolean alpha_adjust_headers
+static bfd_boolean mtalpha_adjust_headers
   PARAMS ((bfd *, struct internal_filehdr *, struct internal_aouthdr *));
-static PTR alpha_ecoff_read_ar_hdr
+static PTR mtalpha_ecoff_read_ar_hdr
   PARAMS ((bfd *));
-static bfd *alpha_ecoff_get_elt_at_filepos
+static bfd *mtalpha_ecoff_get_elt_at_filepos
   PARAMS ((bfd *, file_ptr));
-static bfd *alpha_ecoff_openr_next_archived_file
+static bfd *mtalpha_ecoff_openr_next_archived_file
   PARAMS ((bfd *, bfd *));
-static bfd *alpha_ecoff_get_elt_at_index
+static bfd *mtalpha_ecoff_get_elt_at_index
   PARAMS ((bfd *, symindex));
 
 /* ECOFF has COFF sections, but the debugging information is stored in
@@ -113,12 +113,12 @@ static bfd *alpha_ecoff_get_elt_at_index
 #define NO_COFF_RELOCS
 #define NO_COFF_SYMBOLS
 #define NO_COFF_LINENOS
-#define coff_swap_filehdr_in alpha_ecoff_swap_filehdr_in
-#define coff_swap_filehdr_out alpha_ecoff_swap_filehdr_out
-#define coff_swap_aouthdr_in alpha_ecoff_swap_aouthdr_in
-#define coff_swap_aouthdr_out alpha_ecoff_swap_aouthdr_out
-#define coff_swap_scnhdr_in alpha_ecoff_swap_scnhdr_in
-#define coff_swap_scnhdr_out alpha_ecoff_swap_scnhdr_out
+#define coff_swap_filehdr_in mtalpha_ecoff_swap_filehdr_in
+#define coff_swap_filehdr_out mtalpha_ecoff_swap_filehdr_out
+#define coff_swap_aouthdr_in mtalpha_ecoff_swap_aouthdr_in
+#define coff_swap_aouthdr_out mtalpha_ecoff_swap_aouthdr_out
+#define coff_swap_scnhdr_in mtalpha_ecoff_swap_scnhdr_in
+#define coff_swap_scnhdr_out mtalpha_ecoff_swap_scnhdr_out
 #include "coffswap.h"
 
 /* Get the ECOFF swapping routines.  */
@@ -147,7 +147,7 @@ reloc_nil (abfd, reloc, sym, data, sec, output_bfd, error_message)
    from smaller values.  Start with zero, widen, *then* decrement.  */
 #define MINUS_ONE	(((bfd_vma)0) - 1)
 
-static reloc_howto_type alpha_howto_table[] =
+static reloc_howto_type mtalpha_howto_table[] =
 {
   /* Reloc type 0 is ignored by itself.  However, it appears after a
      GPDISP reloc to identify the location where the low order 16 bits
@@ -437,7 +437,7 @@ static reloc_howto_type alpha_howto_table[] =
 /* Recognize an Alpha ECOFF file.  */
 
 static const bfd_target *
-alpha_ecoff_object_p (abfd)
+mtalpha_ecoff_object_p (abfd)
      bfd *abfd;
 {
   static const bfd_target *ret;
@@ -476,7 +476,7 @@ alpha_ecoff_object_p (abfd)
 /* See whether the magic number matches.  */
 
 static bfd_boolean
-alpha_ecoff_bad_format_hook (abfd, filehdr)
+mtalpha_ecoff_bad_format_hook (abfd, filehdr)
      bfd *abfd ATTRIBUTE_UNUSED;
      PTR filehdr;
 {
@@ -498,7 +498,7 @@ alpha_ecoff_bad_format_hook (abfd, filehdr)
    specific information.  */
 
 static PTR
-alpha_ecoff_mkobject_hook (abfd, filehdr, aouthdr)
+mtalpha_ecoff_mkobject_hook (abfd, filehdr, aouthdr)
      bfd *abfd;
      PTR filehdr;
      PTR aouthdr;
@@ -533,7 +533,7 @@ alpha_ecoff_mkobject_hook (abfd, filehdr, aouthdr)
 /* Swap a reloc in.  */
 
 static void
-alpha_ecoff_swap_reloc_in (abfd, ext_ptr, intern)
+mtalpha_ecoff_swap_reloc_in (abfd, ext_ptr, intern)
      bfd *abfd;
      PTR ext_ptr;
      struct internal_reloc *intern;
@@ -581,7 +581,7 @@ alpha_ecoff_swap_reloc_in (abfd, ext_ptr, intern)
 /* Swap a reloc out.  */
 
 static void
-alpha_ecoff_swap_reloc_out (abfd, intern, dst)
+mtalpha_ecoff_swap_reloc_out (abfd, intern, dst)
      bfd *abfd;
      const struct internal_reloc *intern;
      PTR dst;
@@ -636,7 +636,7 @@ alpha_ecoff_swap_reloc_out (abfd, intern, dst)
    this backend routine.  It must fill in the howto field.  */
 
 static void
-alpha_adjust_reloc_in (abfd, intern, rptr)
+mtalpha_adjust_reloc_in (abfd, intern, rptr)
      bfd *abfd;
      const struct internal_reloc *intern;
      arelent *rptr;
@@ -719,16 +719,16 @@ alpha_adjust_reloc_in (abfd, intern, rptr)
       break;
     }
 
-  rptr->howto = &alpha_howto_table[intern->r_type];
+  rptr->howto = &mtalpha_howto_table[intern->r_type];
 }
 
 /* When writing out a reloc we need to pull some values back out of
    the addend field into the reloc.  This is roughly the reverse of
-   alpha_adjust_reloc_in, except that there are several changes we do
+   mtalpha_adjust_reloc_in, except that there are several changes we do
    not need to undo.  */
 
 static void
-alpha_adjust_reloc_out (abfd, rel, intern)
+mtalpha_adjust_reloc_out (abfd, rel, intern)
      bfd *abfd ATTRIBUTE_UNUSED;
      const arelent *rel;
      struct internal_reloc *intern;
@@ -770,7 +770,7 @@ alpha_adjust_reloc_out (abfd, rel, intern)
    assembler is going to handle this.  */
 
 static bfd_byte *
-alpha_ecoff_get_relocated_section_contents (abfd, link_info, link_order,
+mtalpha_ecoff_get_relocated_section_contents (abfd, link_info, link_order,
 					    data, relocatable, symbols)
      bfd *abfd;
      struct bfd_link_info *link_info;
@@ -1049,7 +1049,7 @@ alpha_ecoff_get_relocated_section_contents (abfd, link_info, link_order,
 	      abort ();
 
 	    /* The offset and size for this reloc are encoded into the
-	       addend field by alpha_adjust_reloc_in.  */
+	       addend field by mtalpha_adjust_reloc_in.  */
 	    offset = (rel->addend >> 8) & 0xff;
 	    size = rel->addend & 0xff;
 
@@ -1194,80 +1194,80 @@ alpha_ecoff_get_relocated_section_contents (abfd, link_info, link_order,
 /* Get the howto structure for a generic reloc type.  */
 
 static reloc_howto_type *
-alpha_bfd_reloc_type_lookup (abfd, code)
+mtalpha_bfd_reloc_type_lookup (abfd, code)
      bfd *abfd ATTRIBUTE_UNUSED;
      bfd_reloc_code_real_type code;
 {
-  int alpha_type;
+  int mtalpha_type;
 
   switch (code)
     {
     case BFD_RELOC_32:
-      alpha_type = ALPHA_R_REFLONG;
+      mtalpha_type = ALPHA_R_REFLONG;
       break;
     case BFD_RELOC_64:
     case BFD_RELOC_CTOR:
-      alpha_type = ALPHA_R_REFQUAD;
+      mtalpha_type = ALPHA_R_REFQUAD;
       break;
     case BFD_RELOC_GPREL32:
-      alpha_type = ALPHA_R_GPREL32;
+      mtalpha_type = ALPHA_R_GPREL32;
       break;
     case BFD_RELOC_ALPHA_LITERAL:
-      alpha_type = ALPHA_R_LITERAL;
+      mtalpha_type = ALPHA_R_LITERAL;
       break;
     case BFD_RELOC_ALPHA_LITUSE:
-      alpha_type = ALPHA_R_LITUSE;
+      mtalpha_type = ALPHA_R_LITUSE;
       break;
     case BFD_RELOC_ALPHA_GPDISP_HI16:
-      alpha_type = ALPHA_R_GPDISP;
+      mtalpha_type = ALPHA_R_GPDISP;
       break;
     case BFD_RELOC_ALPHA_GPDISP_LO16:
-      alpha_type = ALPHA_R_IGNORE;
+      mtalpha_type = ALPHA_R_IGNORE;
       break;
     case BFD_RELOC_23_PCREL_S2:
-      alpha_type = ALPHA_R_BRADDR;
+      mtalpha_type = ALPHA_R_BRADDR;
       break;
     case BFD_RELOC_ALPHA_HINT:
-      alpha_type = ALPHA_R_HINT;
+      mtalpha_type = ALPHA_R_HINT;
       break;
     case BFD_RELOC_16_PCREL:
-      alpha_type = ALPHA_R_SREL16;
+      mtalpha_type = ALPHA_R_SREL16;
       break;
     case BFD_RELOC_32_PCREL:
-      alpha_type = ALPHA_R_SREL32;
+      mtalpha_type = ALPHA_R_SREL32;
       break;
     case BFD_RELOC_64_PCREL:
-      alpha_type = ALPHA_R_SREL64;
+      mtalpha_type = ALPHA_R_SREL64;
       break;
     default:
       return (reloc_howto_type *) NULL;
     }
 
-  return &alpha_howto_table[alpha_type];
+  return &mtalpha_howto_table[mtalpha_type];
 }
 
 static reloc_howto_type *
-alpha_bfd_reloc_name_lookup (bfd *abfd ATTRIBUTE_UNUSED,
+mtalpha_bfd_reloc_name_lookup (bfd *abfd ATTRIBUTE_UNUSED,
 			     const char *r_name)
 {
   unsigned int i;
 
   for (i = 0;
-       i < sizeof (alpha_howto_table) / sizeof (alpha_howto_table[0]);
+       i < sizeof (mtalpha_howto_table) / sizeof (mtalpha_howto_table[0]);
        i++)
-    if (alpha_howto_table[i].name != NULL
-	&& strcasecmp (alpha_howto_table[i].name, r_name) == 0)
-      return &alpha_howto_table[i];
+    if (mtalpha_howto_table[i].name != NULL
+	&& strcasecmp (mtalpha_howto_table[i].name, r_name) == 0)
+      return &mtalpha_howto_table[i];
 
   return NULL;
 }
 
-/* A helper routine for alpha_relocate_section which converts an
+/* A helper routine for mtalpha_relocate_section which converts an
    external reloc when generating relocatable output.  Returns the
    relocation amount.  */
 
 static bfd_vma
-alpha_convert_external_reloc (output_bfd, info, input_bfd, ext_rel, h)
+mtalpha_convert_external_reloc (output_bfd, info, input_bfd, ext_rel, h)
      bfd *output_bfd ATTRIBUTE_UNUSED;
      struct bfd_link_info *info;
      bfd *input_bfd;
@@ -1384,7 +1384,7 @@ alpha_convert_external_reloc (output_bfd, info, input_bfd, ext_rel, h)
    could be combined somehow.  */
 
 static bfd_boolean
-alpha_relocate_section (output_bfd, info, input_bfd, input_section,
+mtalpha_relocate_section (output_bfd, info, input_bfd, input_section,
 			contents, external_relocs)
      bfd *output_bfd;
      struct bfd_link_info *info;
@@ -1771,7 +1771,7 @@ alpha_relocate_section (output_bfd, info, input_bfd, input_section,
 			return FALSE;
 		    }
 
-		  addend = alpha_convert_external_reloc (output_bfd, info,
+		  addend = mtalpha_convert_external_reloc (output_bfd, info,
 							 input_bfd,
 							 ext_rel, h);
 		}
@@ -1859,7 +1859,7 @@ alpha_relocate_section (output_bfd, info, input_bfd, input_section,
 
 	  /* Perform a relocation.  */
 
-	  howto = &alpha_howto_table[r_type];
+	  howto = &mtalpha_howto_table[r_type];
 
 	  if (r_extern)
 	    {
@@ -1898,7 +1898,7 @@ alpha_relocate_section (output_bfd, info, input_bfd, input_section,
 			return FALSE;
 		    }
 
-		  relocation = alpha_convert_external_reloc (output_bfd,
+		  relocation = mtalpha_convert_external_reloc (output_bfd,
 							     info,
 							     input_bfd,
 							     ext_rel,
@@ -1997,7 +1997,7 @@ alpha_relocate_section (output_bfd, info, input_bfd, input_section,
 					       symndx_to_section[r_symndx]);
 		    if (! ((*info->callbacks->reloc_overflow)
 			   (info, NULL, name,
-			    alpha_howto_table[r_type].name,
+			    mtalpha_howto_table[r_type].name,
 			    (bfd_vma) 0, input_bfd, input_section,
 			    r_vaddr - input_section->vma)))
 		      return FALSE;
@@ -2041,7 +2041,7 @@ alpha_relocate_section (output_bfd, info, input_bfd, input_section,
    sets the dynamic bits in the file header.  */
 
 static bfd_boolean
-alpha_adjust_headers (abfd, fhdr, ahdr)
+mtalpha_adjust_headers (abfd, fhdr, ahdr)
      bfd *abfd;
      struct internal_filehdr *fhdr;
      struct internal_aouthdr *ahdr ATTRIBUTE_UNUSED;
@@ -2058,15 +2058,15 @@ alpha_adjust_headers (abfd, fhdr, ahdr)
    optionally compressed using a simple dictionary scheme.  We know
    how to read such archives, but we don't write them.  */
 
-#define alpha_ecoff_slurp_armap _bfd_ecoff_slurp_armap
-#define alpha_ecoff_slurp_extended_name_table \
+#define mtalpha_ecoff_slurp_armap _bfd_ecoff_slurp_armap
+#define mtalpha_ecoff_slurp_extended_name_table \
   _bfd_ecoff_slurp_extended_name_table
-#define alpha_ecoff_construct_extended_name_table \
+#define mtalpha_ecoff_construct_extended_name_table \
   _bfd_ecoff_construct_extended_name_table
-#define alpha_ecoff_truncate_arname _bfd_ecoff_truncate_arname
-#define alpha_ecoff_write_armap _bfd_ecoff_write_armap
-#define alpha_ecoff_generic_stat_arch_elt _bfd_ecoff_generic_stat_arch_elt
-#define alpha_ecoff_update_armap_timestamp _bfd_ecoff_update_armap_timestamp
+#define mtalpha_ecoff_truncate_arname _bfd_ecoff_truncate_arname
+#define mtalpha_ecoff_write_armap _bfd_ecoff_write_armap
+#define mtalpha_ecoff_generic_stat_arch_elt _bfd_ecoff_generic_stat_arch_elt
+#define mtalpha_ecoff_update_armap_timestamp _bfd_ecoff_update_armap_timestamp
 
 /* A compressed file uses this instead of ARFMAG.  */
 
@@ -2076,7 +2076,7 @@ alpha_adjust_headers (abfd, fhdr, ahdr)
    also accepts ARFZMAG.  */
 
 static PTR
-alpha_ecoff_read_ar_hdr (abfd)
+mtalpha_ecoff_read_ar_hdr (abfd)
      bfd *abfd;
 {
   struct areltdata *ret;
@@ -2108,7 +2108,7 @@ alpha_ecoff_read_ar_hdr (abfd)
    we uncompress the archive element if necessary.  */
 
 static bfd *
-alpha_ecoff_get_elt_at_filepos (archive, filepos)
+mtalpha_ecoff_get_elt_at_filepos (archive, filepos)
      bfd *archive;
      file_ptr filepos;
 {
@@ -2238,7 +2238,7 @@ alpha_ecoff_get_elt_at_filepos (archive, filepos)
 /* Open the next archived file.  */
 
 static bfd *
-alpha_ecoff_openr_next_archived_file (archive, last_file)
+mtalpha_ecoff_openr_next_archived_file (archive, last_file)
      bfd *archive;
      bfd *last_file;
 {
@@ -2265,26 +2265,26 @@ alpha_ecoff_openr_next_archived_file (archive, last_file)
       filestart += filestart % 2;
     }
 
-  return alpha_ecoff_get_elt_at_filepos (archive, filestart);
+  return mtalpha_ecoff_get_elt_at_filepos (archive, filestart);
 }
 
 /* Open the archive file given an index into the armap.  */
 
 static bfd *
-alpha_ecoff_get_elt_at_index (abfd, index)
+mtalpha_ecoff_get_elt_at_index (abfd, index)
      bfd *abfd;
      symindex index;
 {
   carsym *entry;
 
   entry = bfd_ardata (abfd)->symdefs + index;
-  return alpha_ecoff_get_elt_at_filepos (abfd, entry->file_offset);
+  return mtalpha_ecoff_get_elt_at_filepos (abfd, entry->file_offset);
 }
 
 /* This is the ECOFF backend structure.  The backend field of the
    target vector points to this.  */
 
-static const struct ecoff_backend_data alpha_ecoff_backend_data =
+static const struct ecoff_backend_data mtalpha_ecoff_backend_data =
 {
   /* COFF backend structure.  */
   {
@@ -2295,19 +2295,19 @@ static const struct ecoff_backend_data alpha_ecoff_backend_data =
     (unsigned (*) PARAMS ((bfd *,PTR,PTR))) bfd_void, /* sym_out */
     (unsigned (*) PARAMS ((bfd *,PTR,PTR))) bfd_void, /* lineno_out */
     (unsigned (*) PARAMS ((bfd *,PTR,PTR))) bfd_void, /* reloc_out */
-    alpha_ecoff_swap_filehdr_out, alpha_ecoff_swap_aouthdr_out,
-    alpha_ecoff_swap_scnhdr_out,
+    mtalpha_ecoff_swap_filehdr_out, mtalpha_ecoff_swap_aouthdr_out,
+    mtalpha_ecoff_swap_scnhdr_out,
     FILHSZ, AOUTSZ, SCNHSZ, 0, 0, 0, 0, FILNMLEN, TRUE, FALSE, 4, FALSE, 2,
-    alpha_ecoff_swap_filehdr_in, alpha_ecoff_swap_aouthdr_in,
-    alpha_ecoff_swap_scnhdr_in, NULL,
-    alpha_ecoff_bad_format_hook, _bfd_ecoff_set_arch_mach_hook,
-    alpha_ecoff_mkobject_hook, _bfd_ecoff_styp_to_sec_flags,
+    mtalpha_ecoff_swap_filehdr_in, mtalpha_ecoff_swap_aouthdr_in,
+    mtalpha_ecoff_swap_scnhdr_in, NULL,
+    mtalpha_ecoff_bad_format_hook, _bfd_ecoff_set_arch_mach_hook,
+    mtalpha_ecoff_mkobject_hook, _bfd_ecoff_styp_to_sec_flags,
     _bfd_ecoff_set_alignment_hook, _bfd_ecoff_slurp_symbol_table,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL
   },
   /* Supported architecture.  */
-  bfd_arch_alpha,
+  bfd_arch_mtalpha,
   /* Initial portion of armap string.  */
   "________64",
   /* The page boundary used to align sections in a demand-paged
@@ -2320,7 +2320,7 @@ static const struct ecoff_backend_data alpha_ecoff_backend_data =
   /* Bitsize of constructor entries.  */
   64,
   /* Reloc to use for constructor entries.  */
-  &alpha_howto_table[ALPHA_R_REFQUAD],
+  &mtalpha_howto_table[ALPHA_R_REFQUAD],
   {
     /* Symbol table magic number.  */
     magicSym2,
@@ -2363,27 +2363,27 @@ static const struct ecoff_backend_data alpha_ecoff_backend_data =
   /* External reloc size.  */
   RELSZ,
   /* Reloc swapping functions.  */
-  alpha_ecoff_swap_reloc_in,
-  alpha_ecoff_swap_reloc_out,
+  mtalpha_ecoff_swap_reloc_in,
+  mtalpha_ecoff_swap_reloc_out,
   /* Backend reloc tweaking.  */
-  alpha_adjust_reloc_in,
-  alpha_adjust_reloc_out,
+  mtalpha_adjust_reloc_in,
+  mtalpha_adjust_reloc_out,
   /* Relocate section contents while linking.  */
-  alpha_relocate_section,
+  mtalpha_relocate_section,
   /* Do final adjustments to filehdr and aouthdr.  */
-  alpha_adjust_headers,
+  mtalpha_adjust_headers,
   /* Read an element from an archive at a given file position.  */
-  alpha_ecoff_get_elt_at_filepos
+  mtalpha_ecoff_get_elt_at_filepos
 };
 
 /* Looking up a reloc type is Alpha specific.  */
-#define _bfd_ecoff_bfd_reloc_type_lookup alpha_bfd_reloc_type_lookup
+#define _bfd_ecoff_bfd_reloc_type_lookup mtalpha_bfd_reloc_type_lookup
 #define _bfd_ecoff_bfd_reloc_name_lookup \
-  alpha_bfd_reloc_name_lookup
+  mtalpha_bfd_reloc_name_lookup
 
 /* So is getting relocated section contents.  */
 #define _bfd_ecoff_bfd_get_relocated_section_contents \
-  alpha_ecoff_get_relocated_section_contents
+  mtalpha_ecoff_get_relocated_section_contents
 
 /* Handling file windows is generic.  */
 #define _bfd_ecoff_get_section_contents_in_window \
@@ -2398,9 +2398,9 @@ static const struct ecoff_backend_data alpha_ecoff_backend_data =
 #define _bfd_ecoff_section_already_linked \
   _bfd_generic_section_already_linked
 
-const bfd_target ecoffalpha_little_vec =
+const bfd_target ecoffmtalpha_little_vec =
 {
-  "ecoff-littlealpha",		/* name */
+  "ecoff-littlemtalpha",		/* name */
   bfd_target_ecoff_flavour,
   BFD_ENDIAN_LITTLE,		/* data byte order is little */
   BFD_ENDIAN_LITTLE,		/* header byte order is little */
@@ -2420,7 +2420,7 @@ const bfd_target ecoffalpha_little_vec =
      bfd_getl32, bfd_getl_signed_32, bfd_putl32,
      bfd_getl16, bfd_getl_signed_16, bfd_putl16, /* hdrs */
 
-  {_bfd_dummy_target, alpha_ecoff_object_p, /* bfd_check_format */
+  {_bfd_dummy_target, mtalpha_ecoff_object_p, /* bfd_check_format */
      _bfd_ecoff_archive_p, _bfd_dummy_target},
   {bfd_false, _bfd_ecoff_mkobject,  /* bfd_set_format */
      _bfd_generic_mkarchive, bfd_false},
@@ -2430,7 +2430,7 @@ const bfd_target ecoffalpha_little_vec =
      BFD_JUMP_TABLE_GENERIC (_bfd_ecoff),
      BFD_JUMP_TABLE_COPY (_bfd_ecoff),
      BFD_JUMP_TABLE_CORE (_bfd_nocore),
-     BFD_JUMP_TABLE_ARCHIVE (alpha_ecoff),
+     BFD_JUMP_TABLE_ARCHIVE (mtalpha_ecoff),
      BFD_JUMP_TABLE_SYMBOLS (_bfd_ecoff),
      BFD_JUMP_TABLE_RELOCS (_bfd_ecoff),
      BFD_JUMP_TABLE_WRITE (_bfd_ecoff),
@@ -2439,5 +2439,5 @@ const bfd_target ecoffalpha_little_vec =
 
   NULL,
 
-  (PTR) &alpha_ecoff_backend_data
+  (PTR) &mtalpha_ecoff_backend_data
 };
