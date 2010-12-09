@@ -1,10 +1,10 @@
 SCRIPT_NAME=elf
 ELFSIZE=64
 TEMPLATE_NAME=elf32
-OUTPUT_FORMAT="elf64-sparc"
+OUTPUT_FORMAT="elf64-mtsparc"
 MAXPAGESIZE="CONSTANT (MAXPAGESIZE)"
 COMMONPAGESIZE="CONSTANT (COMMONPAGESIZE)"
-ARCH="sparc:v9"
+ARCH="mtsparc:v9"
 MACHINE=
 DATA_PLT=
 GENERATE_SHLIB_SCRIPT=yes
@@ -40,9 +40,9 @@ fi
 case "$EMULATION_NAME" in
   *64*)
     case "$target" in
-      sparc*-linux*)
+      mtsparc*-linux*)
 	LIBPATH_SUFFIX=64 ;;
-      sparc*-solaris*)
+      mtsparc*-solaris*)
 	LIBPATH_SUFFIX=/sparcv9 ;;
     esac
     ;;

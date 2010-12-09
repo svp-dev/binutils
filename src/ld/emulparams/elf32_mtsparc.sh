@@ -1,13 +1,13 @@
 # If you change this file, please also look at files which source this one:
-# elf32_sparc_vxworks.sh
+# elf32_mtsparc_vxworks.sh
 
 SCRIPT_NAME=elf
-OUTPUT_FORMAT="elf32-sparc"
+OUTPUT_FORMAT="elf32-mtsparc"
 TEXT_START_ADDR=0x10000
 MAXPAGESIZE="CONSTANT (MAXPAGESIZE)"
 COMMONPAGESIZE="CONSTANT (COMMONPAGESIZE)"
 ALIGNMENT=8
-ARCH=sparc
+ARCH=mtsparc
 MACHINE=
 TEMPLATE_NAME=elf32
 DATA_PLT=
