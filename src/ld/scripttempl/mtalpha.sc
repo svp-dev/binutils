@@ -1,4 +1,4 @@
-# Linker script for Alpha systems.
+# Linker script for Microthreaded Alpha systems.
 # Ian Lance Taylor <ian@cygnus.com>.
 # These variables may be overridden by the emulation file.  The
 # defaults are appropriate for an Alpha running OSF/1.

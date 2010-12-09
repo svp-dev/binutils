@@ -1,3 +1,3 @@
-SCRIPT_NAME=alpha
-OUTPUT_FORMAT="ecoff-littlealpha"
-ARCH=alpha
+SCRIPT_NAME=mtalpha
+OUTPUT_FORMAT="ecoff-littlemtalpha"
+ARCH=mtalpha

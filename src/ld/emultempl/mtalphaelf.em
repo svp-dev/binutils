@@ -31,19 +31,19 @@ fragment <<EOF
 static bfd_boolean limit_32bit;
 static bfd_boolean disable_relaxation;
 
-extern bfd_boolean elf64_alpha_use_secureplt;
-extern const bfd_target bfd_elf64_alpha_vec;
-extern const bfd_target bfd_elf64_alpha_freebsd_vec;
+extern bfd_boolean elf64_mtalpha_use_secureplt;
+extern const bfd_target bfd_elf64_mtalpha_vec;
+extern const bfd_target bfd_elf64_mtalpha_freebsd_vec;
 
 
 /* Set the start address as in the Tru64 ld.  */
 #define ALPHA_TEXT_START_32BIT 0x12000000
 
 static void
-alpha_after_open (void)
+mtalpha_after_open (void)
 {
-  if (link_info.hash->creator == &bfd_elf64_alpha_vec
-      || link_info.hash->creator == &bfd_elf64_alpha_freebsd_vec)
+  if (link_info.hash->creator == &bfd_elf64_mtalpha_vec
+      || link_info.hash->creator == &bfd_elf64_mtalpha_freebsd_vec)
     {
       unsigned int num_plt;
       lang_output_section_statement_type *os;
@@ -64,8 +64,8 @@ alpha_after_open (void)
 
       if (num_plt == 2)
 	{
-	  plt_os[0]->constraint = elf64_alpha_use_secureplt ? 0 : -1;
-	  plt_os[1]->constraint = elf64_alpha_use_secureplt ? -1 : 0;
+	  plt_os[0]->constraint = elf64_mtalpha_use_secureplt ? 0 : -1;
+	  plt_os[1]->constraint = elf64_mtalpha_use_secureplt ? -1 : 0;
 	}
     }
 
@@ -73,7 +73,7 @@ alpha_after_open (void)
 }
 
 static void
-alpha_after_parse (void)
+mtalpha_after_parse (void)
 {
   if (limit_32bit && !link_info.shared && !link_info.relocatable)
     lang_section_start (".interp",
@@ -84,7 +84,7 @@ alpha_after_parse (void)
 }
 
 static void
-alpha_before_allocation (void)
+mtalpha_before_allocation (void)
 {
   /* Call main function; we're just extending it.  */
   gld${EMULATION_NAME}_before_allocation ();
@@ -95,7 +95,7 @@ alpha_before_allocation (void)
 }
 
 static void
-alpha_finish (void)
+mtalpha_finish (void)
 {
   if (limit_32bit)
     elf_elfheader (output_bfd)->e_flags |= EF_ALPHA_32BIT;
@@ -139,16 +139,16 @@ PARSE_AND_LIST_ARGS_CASES='
       disable_relaxation = TRUE;
       break;
     case OPTION_SECUREPLT:
-      elf64_alpha_use_secureplt = TRUE;
+      elf64_mtalpha_use_secureplt = TRUE;
       break;
     case OPTION_NO_SECUREPLT:
-      elf64_alpha_use_secureplt = FALSE;
+      elf64_mtalpha_use_secureplt = FALSE;
       break;
 '
 
 # Put these extra alpha routines in ld_${EMULATION_NAME}_emulation
 #
-LDEMUL_AFTER_OPEN=alpha_after_open
-LDEMUL_AFTER_PARSE=alpha_after_parse
-LDEMUL_BEFORE_ALLOCATION=alpha_before_allocation
-LDEMUL_FINISH=alpha_finish
+LDEMUL_AFTER_OPEN=mtalpha_after_open
+LDEMUL_AFTER_PARSE=mtalpha_after_parse
+LDEMUL_BEFORE_ALLOCATION=mtalpha_before_allocation
+LDEMUL_FINISH=mtalpha_finish
