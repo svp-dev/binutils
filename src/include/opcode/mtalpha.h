@@ -1,4 +1,4 @@
-/* alpha.h -- Header file for Alpha opcode table
+/* mtalpha.h -- Header file for Microthreaded Alpha opcode table
    Copyright 1996, 1999, 2001, 2003 Free Software Foundation, Inc.
    Contributed by Richard Henderson <rth@tamu.edu>,
    patterned after the PPC opcode table written by Ian Lance Taylor.
@@ -19,8 +19,8 @@ You should have received a copy of the GNU General Public License
 along with this file; see the file COPYING.  If not, write to the Free
 Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifndef OPCODE_ALPHA_H
-#define OPCODE_ALPHA_H
+#ifndef OPCODE_MTALPHA_H
+#define OPCODE_MTALPHA_H
 
 /* The opcode table is an array of struct alpha_opcode.  */
 
@@ -47,14 +47,14 @@ struct alpha_opcode
   /* An array of operand codes.  Each code is an index into the
      operand table.  They appear in the order which the operands must
      appear in assembly code, and are terminated by a zero.  */
-  unsigned char operands[4];
+  unsigned char operands[5];
 };
 
 /* The table itself is sorted by major opcode number, and is otherwise
    in the order in which the disassembler should consider
    instructions.  */
-extern const struct alpha_opcode alpha_opcodes[];
-extern const unsigned alpha_num_opcodes;
+extern const struct alpha_opcode mtalpha_opcodes[];
+extern const unsigned mtalpha_num_opcodes;
 
 /* Values defined for the flags field of a struct alpha_opcode.  */
 
@@ -133,8 +133,8 @@ struct alpha_operand
 /* Elements in the table are retrieved by indexing with values from
    the operands field of the alpha_opcodes table.  */
 
-extern const struct alpha_operand alpha_operands[];
-extern const unsigned alpha_num_operands;
+extern const struct alpha_operand mtalpha_operands[];
+extern const unsigned mtalpha_num_operands;
 
 /* Values defined for the flags field of a struct alpha_operand.  */
 
@@ -234,4 +234,4 @@ extern const unsigned alpha_num_operands;
 #define AXP_REG_SP	30
 #define AXP_REG_ZERO	31
 
-#endif /* OPCODE_ALPHA_H */
+#endif /* OPCODE_MTALPHA_H */
