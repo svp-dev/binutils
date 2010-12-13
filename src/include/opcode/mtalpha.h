@@ -200,38 +200,38 @@ extern const unsigned mtalpha_num_operands;
 
 /* Register common names */
 
-#define AXP_REG_V0	0
-#define AXP_REG_T0	1
-#define AXP_REG_T1	2
-#define AXP_REG_T2	3
-#define AXP_REG_T3	4
-#define AXP_REG_T4	5
-#define AXP_REG_T5	6
-#define AXP_REG_T6	7
-#define AXP_REG_T7	8
-#define AXP_REG_S0	9
-#define AXP_REG_S1	10
-#define AXP_REG_S2	11
-#define AXP_REG_S3	12
-#define AXP_REG_S4	13
-#define AXP_REG_S5	14
-#define AXP_REG_FP	15
-#define AXP_REG_A0	16
-#define AXP_REG_A1	17
-#define AXP_REG_A2	18
-#define AXP_REG_A3	19
-#define AXP_REG_A4	20
-#define AXP_REG_A5	21
-#define AXP_REG_T8	22
-#define AXP_REG_T9	23
-#define AXP_REG_T10	24
-#define AXP_REG_T11	25
-#define AXP_REG_RA	26
-#define AXP_REG_PV	27
-#define AXP_REG_T12	27
-#define AXP_REG_AT	28
-#define AXP_REG_GP	29
-#define AXP_REG_SP	30
+#define AXP_REG_V0	1
+#define AXP_REG_T0	19
+#define AXP_REG_T1	20
+#define AXP_REG_T2	21
+#define AXP_REG_T3	22
+#define AXP_REG_T4	23
+#define AXP_REG_T5	24
+#define AXP_REG_T6	25
+#define AXP_REG_T7	26
+#define AXP_REG_S0	8
+#define AXP_REG_S1	9
+#define AXP_REG_S2	10
+#define AXP_REG_S3	11
+#define AXP_REG_S4	12
+#define AXP_REG_S5	13
+#define AXP_REG_FP	16
+#define AXP_REG_A0	7
+#define AXP_REG_A1	6
+#define AXP_REG_A2	5
+#define AXP_REG_A3	4
+#define AXP_REG_A4	3
+#define AXP_REG_A5	2
+#define AXP_REG_T8	27
+#define AXP_REG_T9	28
+#define AXP_REG_T10	29
+#define AXP_REG_T11	30
+#define AXP_REG_RA	15
+#define AXP_REG_PV	14
+#define AXP_REG_T12	14
+#define AXP_REG_AT	0
+#define AXP_REG_GP	17
+#define AXP_REG_SP	18
 #define AXP_REG_ZERO	31
 
 #endif /* OPCODE_MTALPHA_H */
