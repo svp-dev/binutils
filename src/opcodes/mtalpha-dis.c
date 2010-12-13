@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include "sysdep.h"
 #include "dis-asm.h"
-#include "opcode/alpha.h"
+#include "opcode/mtalpha.h"
 
 /* OSF register names.  */
 
@@ -55,7 +55,7 @@ static const char * const vms_regnames[64] = {
 /* Disassemble Alpha instructions.  */
 
 int
-print_insn_alpha (memaddr, info)
+print_insn_mtalpha (memaddr, info)
      bfd_vma memaddr;
      struct disassemble_info *info;
 {
@@ -69,8 +69,8 @@ print_insn_alpha (memaddr, info)
   /* Initialize the majorop table the first time through */
   if (!opcode_index[0])
     {
-      opcode = alpha_opcodes;
-      opcode_end = opcode + alpha_num_opcodes;
+      opcode = mtalpha_opcodes;
+      opcode_end = opcode + mtalpha_num_opcodes;
 
       for (op = 0; op < AXP_NOPS; ++op)
 	{
@@ -89,13 +89,13 @@ print_insn_alpha (memaddr, info)
   isa_mask = AXP_OPCODE_NOPAL;
   switch (info->mach)
     {
-    case bfd_mach_alpha_ev4:
+    case bfd_mach_mtalpha_ev4:
       isa_mask |= AXP_OPCODE_EV4;
       break;
-    case bfd_mach_alpha_ev5:
+    case bfd_mach_mtalpha_ev5:
       isa_mask |= AXP_OPCODE_EV5;
       break;
-    case bfd_mach_alpha_ev6:
+    case bfd_mach_mtalpha_ev6:
       isa_mask |= AXP_OPCODE_EV6;
       break;
     }
@@ -132,7 +132,7 @@ print_insn_alpha (memaddr, info)
 	int invalid = 0;
 	for (opindex = opcode->operands; *opindex != 0; opindex++)
 	  {
-	    const struct alpha_operand *operand = alpha_operands + *opindex;
+	    const struct alpha_operand *operand = mtalpha_operands + *opindex;
 	    if (operand->extract)
 	      (*operand->extract) (insn, &invalid);
 	  }
@@ -158,7 +158,7 @@ found:
   need_comma = 0;
   for (opindex = opcode->operands; *opindex != 0; opindex++)
     {
-      const struct alpha_operand *operand = alpha_operands + *opindex;
+      const struct alpha_operand *operand = mtalpha_operands + *opindex;
       int value;
 
       /* Operands that are marked FAKE are simply ignored.  We

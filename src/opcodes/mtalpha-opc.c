@@ -1,4 +1,4 @@
-/* alpha-opc.c -- Alpha AXP opcode list
+/* mtalpha-opc.c -- Mixrothreaded Alpha AXP opcode list
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2007
    Free Software Foundation, Inc.
    Contributed by Richard Henderson <rth@cygnus.com>,
@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 #include "sysdep.h"
-#include "opcode/alpha.h"
+#include "opcode/mtalpha.h"
 #include "bfd.h"
 #include "opintl.h"
 
@@ -145,7 +145,6 @@ extract_zc (unsigned insn, int *invalid)
   return 0;
 }
 
-
 /* The displacement field of a Branch format insn.  */
 
 static unsigned
@@ -160,6 +159,16 @@ static int
 extract_bdisp (unsigned insn, int *invalid ATTRIBUTE_UNUSED)
 {
   return 4 * (((insn & 0x1FFFFF) ^ 0x100000) - 0x100000);
+}
+
+/* Fake displacement field of a Branch format insn where it must be zero.  */
+
+static int
+extract_zbdisp (unsigned insn, int *invalid)
+{
+  if (invalid != (int *) NULL && extract_bdisp(insn, invalid) != 0)
+    *invalid = 1;
+  return 0;
 }
 
 /* The hint field of a JMP/JSR insn.  */
@@ -196,7 +205,7 @@ extract_ev6hwjhint (unsigned insn, int *invalid ATTRIBUTE_UNUSED)
 
 /* The operands table.   */
 
-const struct alpha_operand alpha_operands[] =
+const struct alpha_operand mtalpha_operands[] =
 {
   /* The fields are bits, shift, insert, extract, flags */
   /* The zero index is used to indicate end-of-list */
@@ -278,8 +287,12 @@ const struct alpha_operand alpha_operands[] =
   { 21, 0, BFD_RELOC_23_PCREL_S2, 
     AXP_OPERAND_RELATIVE, insert_bdisp, extract_bdisp },
 
+  /* The signed "23-bit" aligned displacement of Branch format insns when it is zero.  */
+#define ZBDISP		(BDISP + 1)
+  { 21, 0, 0, AXP_OPERAND_FAKE, 0, extract_zbdisp },
+
   /* The 26-bit PALcode function */
-#define PALFN		(BDISP + 1)
+#define PALFN		(ZBDISP + 1)
   { 26, 0, -PALFN, AXP_OPERAND_UNSIGNED, 0, 0 },
 
   /* The optional signed "16-bit" aligned displacement of the JMP/JSR hint.  */
@@ -324,10 +337,19 @@ const struct alpha_operand alpha_operands[] =
 #define EV6HWJMPHINT	(EV6HWINDEX+ 1)
   { 8, 0, -EV6HWJMPHINT,
     AXP_OPERAND_RELATIVE|AXP_OPERAND_DEFAULT_ZERO|AXP_OPERAND_NOOVERFLOW,
-    insert_ev6hwjhint, extract_ev6hwjhint }
+    insert_ev6hwjhint, extract_ev6hwjhint },
+
+/* 5-bit index for indentifying globals or shareds in a child context */
+#define IDXB (EV6HWJMPHINT + 1)
+  { 5, 16, 0, AXP_OPERAND_UNSIGNED, 0, 0 },
+
+/* 5-bit index for indentifying globals or shareds in a child context */
+#define IDXC (IDXB + 1)
+  { 5, 0, 0, AXP_OPERAND_UNSIGNED, 0, 0 },
 };
 
-const unsigned alpha_num_operands = sizeof(alpha_operands)/sizeof(*alpha_operands);
+
+const unsigned mtalpha_num_operands = sizeof(mtalpha_operands)/sizeof(*mtalpha_operands);
 
 
 /* Macros used to form opcodes.  */
@@ -467,7 +489,7 @@ const unsigned alpha_num_operands = sizeof(alpha_operands)/sizeof(*alpha_operand
    		presumably undefined results on previous implementations
 		that were not assigned to a particular extension.  */
 
-const struct alpha_opcode alpha_opcodes[] =
+const struct alpha_opcode mtalpha_opcodes[] =
 {
   { "halt",		SPCD(0x00,0x0000), BASE, ARG_NONE },
   { "draina",		SPCD(0x00,0x0002), BASE, ARG_NONE },
@@ -481,6 +503,47 @@ const struct alpha_opcode alpha_opcodes[] =
   { "gentrap",		SPCD(0x00,0x00aa), BASE, ARG_NONE },
   { "call_pal",		PCD(0x00), BASE, ARG_PCD },
   { "pal",		PCD(0x00), BASE, ARG_PCD },		/* alias */
+
+/*** MT extensions ***/
+
+  { "allocate", OPR (0x01,0x0), BASE, { ZA, RB,  RC } },
+  { "allocate", OPRL(0x01,0x0), BASE, { ZA, LIT, RC } },
+  { "setstart", OPR (0x01,0x1), BASE, { RA, RB,  ZC } },
+  { "setstart", OPRL(0x01,0x1), BASE, { RA, LIT, ZC } },
+  { "setlimit", OPR (0x01,0x2), BASE, { RA, RB,  ZC } },
+  { "setlimit", OPRL(0x01,0x2), BASE, { RA, LIT, ZC } },
+  { "setstep",  OPR (0x01,0x3), BASE, { RA, RB,  ZC } },
+  { "setstep",  OPRL(0x01,0x3), BASE, { RA, LIT, ZC } },
+  { "setblock", OPR (0x01,0x4), BASE, { RA, RB,  ZC } },
+  { "setblock", OPRL(0x01,0x4), BASE, { RA, LIT, ZC } },
+  { "kill",     OPR (0x01,0x5), BASE, { RA, ZB,  ZC } },
+  { "break",    OPR (0x01,0x6), BASE, ARG_NONE },
+  { "ldbp",     OPRL(0x01,0x7), BASE, { ZA, ZB,  RC } },
+  { "ldfp",     OPRL(0x01,0x8), BASE, { ZA, ZB,  RC } },
+  { "getprocs", OPRL(0x01,0x9), BASE, { ZA, ZB,  RC } },
+  { "print",    OPR (0x01,0x10), BASE, { RA, RB,  ZC } },
+  { "print",    OPRL(0x01,0x10), BASE, { RA, LIT, ZC } },
+  { "putg",     OPR (0x01,0x11), BASE, { RB, RA,  IDXC} },
+  { "putg",     OPRL(0x01,0x11), BASE, { LIT, RA,  IDXC} },
+  { "puts",     OPR (0x01,0x12), BASE, { RB,  RA,  IDXC} },
+  { "puts",     OPRL(0x01,0x12), BASE, { LIT, RA,  IDXC} },
+  { "gets",     OPR (0x01,0x13), BASE, { RA,  IDXB, RC} },
+  { "sync",     OPR (0x01,0x14), BASE, { RA, ZB,  RC } },
+  { "detach",   OPR (0x01,0x15), BASE, { RA, ZB,  ZC } },
+  { "release",  OPR (0x01,0x15), BASE, { RA, ZB,  ZC } }, /* alias */
+  { "ioctl",    OPR (0x01,0x16), BASE, { RA, RB,  RC } },
+  { "ioctl",    OPRL(0x01,0x16), BASE, { RA, LIT, RC } },
+
+  { "crei",     MEM (0x03), BASE, ARG_MEM },
+
+  { "cred",     BRA (0x04), BASE, ARG_BRA },
+
+  { "fputg",    FP (0x05,0x000), BASE, { FB, RA,   IDXC} },
+  { "fputs",    FP (0x05,0x001), BASE, { FB, RA,   IDXC} },
+  { "fgets",    FP (0x05,0x002), BASE, { RA, IDXB, FC } },
+  { "printf",   FP (0x05,0x100), BASE, { FB, RA,   ZC } },
+
+/* * */
 
   { "lda",		MEM(0x08), BASE, { RA, MDISP, ZB } },	/* pseudo */
   { "lda",		MEM(0x08), BASE, ARG_MEM },
@@ -651,14 +714,22 @@ const struct alpha_opcode alpha_opcodes[] =
 
   { "mull",		OPR(0x13,0x00), BASE, ARG_OPR },
   { "mull",		OPRL(0x13,0x00), BASE, ARG_OPRL },
+  { "divl",		    OPR (0x13,0x08), BASE, ARG_OPR  },
+  { "divl",		    OPRL(0x13,0x08), BASE, ARG_OPRL },
   { "mulq",		OPR(0x13,0x20), BASE, ARG_OPR },
   { "mulq",		OPRL(0x13,0x20), BASE, ARG_OPRL },
+  { "divq",		    OPR (0x13,0x28), BASE, ARG_OPR  },
+  { "divq",		    OPRL(0x13,0x28), BASE, ARG_OPRL },
   { "umulh",		OPR(0x13,0x30), BASE, ARG_OPR },
   { "umulh",		OPRL(0x13,0x30), BASE, ARG_OPRL },
   { "mull/v",		OPR(0x13,0x40), BASE, ARG_OPR },
   { "mull/v",		OPRL(0x13,0x40), BASE, ARG_OPRL },
+  { "divlu",		OPR (0x13,0x48), BASE, ARG_OPR  },
+  { "divlu",		OPRL(0x13,0x48), BASE, ARG_OPRL },
   { "mulq/v",		OPR(0x13,0x60), BASE, ARG_OPR },
   { "mulq/v",		OPRL(0x13,0x60), BASE, ARG_OPRL },
+  { "divqu",		OPR (0x13,0x68), BASE, ARG_OPR  },
+  { "divqu",		OPRL(0x13,0x68), BASE, ARG_OPRL },
 
   { "itofs",		FP(0x14,0x004), CIX, { RA, ZB, FC } },
   { "sqrtf/c",		FP(0x14,0x00A), CIX, ARG_FPZ1 },
@@ -1037,18 +1108,18 @@ const struct alpha_opcode alpha_opcodes[] =
   { "cvtql/v",		FP(0x17,0x130), BASE, ARG_FPZ1 },
   { "cvtql/sv",		FP(0x17,0x530), BASE, ARG_FPZ1 },
 
-  { "trapb",		MFC(0x18,0x0000), BASE, ARG_NONE },
-  { "draint",		MFC(0x18,0x0000), BASE, ARG_NONE },	/* alias */
-  { "excb",		MFC(0x18,0x0400), BASE, ARG_NONE },
-  { "mb",		MFC(0x18,0x4000), BASE, ARG_NONE },
-  { "wmb",		MFC(0x18,0x4400), BASE, ARG_NONE },
+  { "trapb",		MFC(0x18,0x0000), BASE, {ZA, ZB} },
+  { "draint",		MFC(0x18,0x0000), BASE, {ZA, ZB} },	/* alias */
+  { "excb",		MFC(0x18,0x0400), BASE, {ZA, ZB} },
+  { "mb",		MFC(0x18,0x4000), BASE, {ZA, ZB} },
+  { "wmb",		MFC(0x18,0x4400), BASE, {ZA, ZB} },
   { "fetch",		MFC(0x18,0x8000), BASE, { ZA, PRB } },
   { "fetch_m",		MFC(0x18,0xA000), BASE, { ZA, PRB } },
   { "rpcc",		MFC(0x18,0xC000), BASE, { RA, ZB } },
   { "rpcc",		MFC(0x18,0xC000), BASE, { RA, RB } },	/* ev6 una */
-  { "rc",		MFC(0x18,0xE000), BASE, { RA } },
+  { "rc",		MFC(0x18,0xE000), BASE, { RA, ZB } },
   { "ecb",		MFC(0x18,0xE800), BASE, { ZA, PRB } },	/* ev56 una */
-  { "rs",		MFC(0x18,0xF000), BASE, { RA } },
+  { "rs",		MFC(0x18,0xF000), BASE, { RA, ZB } },
   { "wh64",		MFC(0x18,0xF800), BASE, { ZA, PRB } },	/* ev56 una */
   { "wh64en",		MFC(0x18,0xFC00), BASE, { ZA, PRB } },	/* ev7 una */
 
@@ -1476,6 +1547,7 @@ const struct alpha_opcode alpha_opcodes[] =
   { "stl_c",		MEM(0x2E), BASE, ARG_MEM },
   { "stq_c",		MEM(0x2F), BASE, ARG_MEM },
 
+  { "ldpc",		BRA(0x30), BASE, { RA, ZBDISP } }, /* pseudo, alias */
   { "br",		BRA(0x30), BASE, { ZA, BDISP } },	/* pseudo */
   { "br",		BRA(0x30), BASE, ARG_BRA },
   { "fbeq",		BRA(0x31), BASE, ARG_FBRA },
@@ -1495,4 +1567,4 @@ const struct alpha_opcode alpha_opcodes[] =
   { "bgt",		BRA(0x3F), BASE, ARG_BRA },
 };
 
-const unsigned alpha_num_opcodes = sizeof(alpha_opcodes)/sizeof(*alpha_opcodes);
+const unsigned mtalpha_num_opcodes = sizeof(mtalpha_opcodes)/sizeof(*mtalpha_opcodes);
