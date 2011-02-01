@@ -666,6 +666,7 @@ print_insn_mtsparc (bfd_vma memaddr, disassemble_info *info)
 		  case 'i':	/* 13 bit immediate.  */
 		  case 'I':	/* 11 bit immediate.  */
 		  case 'j':	/* 10 bit immediate.  */
+      case '^':     /* 9 bit immediate.  LKO */
 		    {
 		      int imm;
 
@@ -673,8 +674,10 @@ print_insn_mtsparc (bfd_vma memaddr, disassemble_info *info)
 		        imm = X_SIMM (insn, 13);
 		      else if (*s == 'I')
 			imm = X_SIMM (insn, 11);
-		      else
+          else if (*s == 'j')
 			imm = X_SIMM (insn, 10);
+          else //if (*s == '^')
+            imm = X_IMM (insn, 9); //LKO : unsigned 9 bit immediate value
 
 		      /* Check to see whether we have a 1+i, and take
 			 note of that fact.

@@ -2464,6 +2464,9 @@ relocation types already defined.  */
   BFD_RELOC_SPARC_BASE13,
   BFD_RELOC_SPARC_BASE22,
 
+// LKO : uT extension
+  BFD_RELOC_SPARC_9,
+
 /* SPARC64 relocations  */
 #define BFD_RELOC_SPARC_64 BFD_RELOC_64
   BFD_RELOC_SPARC_10,

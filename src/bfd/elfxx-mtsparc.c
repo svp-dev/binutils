@@ -209,6 +209,7 @@ static reloc_howto_type _bfd_sparc_elf_howto_table[] =
   HOWTO(R_SPARC_PCPLT32,   0,0,00,FALSE,0,complain_overflow_dont,    sparc_elf_notsup_reloc, "R_SPARC_PCPLT32",  FALSE,0,0x00000000,TRUE),
   HOWTO(R_SPARC_PCPLT22,   0,0,00,FALSE,0,complain_overflow_dont,    sparc_elf_notsup_reloc, "R_SPARC_PCPLT22",  FALSE,0,0x00000000,TRUE),
   HOWTO(R_SPARC_PCPLT10,   0,0,00,FALSE,0,complain_overflow_dont,    sparc_elf_notsup_reloc, "R_SPARC_PCPLT10",  FALSE,0,0x00000000,TRUE),
+  HOWTO(R_SPARC_9,         0,2,9, FALSE,0,complain_overflow_bitfield,bfd_elf_generic_reloc,  "R_SPARC_9",        FALSE,0,0x000001ff,TRUE),
   HOWTO(R_SPARC_10,        0,2,10,FALSE,0,complain_overflow_bitfield,bfd_elf_generic_reloc,  "R_SPARC_10",      FALSE,0,0x000003ff,TRUE),
   HOWTO(R_SPARC_11,        0,2,11,FALSE,0,complain_overflow_bitfield,bfd_elf_generic_reloc,  "R_SPARC_11",      FALSE,0,0x000007ff,TRUE),
   HOWTO(R_SPARC_64,        0,4,64,FALSE,0,complain_overflow_bitfield,bfd_elf_generic_reloc,  "R_SPARC_64",      FALSE,0,MINUS_ONE, TRUE),
@@ -302,6 +303,7 @@ static const struct elf_reloc_map sparc_reloc_map[] =
   { BFD_RELOC_SPARC_UA16, R_SPARC_UA16 },
   { BFD_RELOC_SPARC_UA32, R_SPARC_UA32 },
   { BFD_RELOC_SPARC_UA64, R_SPARC_UA64 },
+  { BFD_RELOC_SPARC_9, R_SPARC_9 },
   { BFD_RELOC_SPARC_10, R_SPARC_10 },
   { BFD_RELOC_SPARC_11, R_SPARC_11 },
   { BFD_RELOC_SPARC_64, R_SPARC_64 },
@@ -1359,6 +1361,7 @@ _bfd_sparc_elf_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	case R_SPARC_LO10:
 	case R_SPARC_UA16:
 	case R_SPARC_UA32:
+	case R_SPARC_9:
 	case R_SPARC_10:
 	case R_SPARC_11:
 	case R_SPARC_64:
@@ -1653,6 +1656,7 @@ _bfd_sparc_elf_gc_sweep_hook (bfd *abfd, struct bfd_link_info *info,
 	case R_SPARC_UA16:
 	case R_SPARC_UA32:
 	case R_SPARC_PLT32:
+	case R_SPARC_9:
 	case R_SPARC_10:
 	case R_SPARC_11:
 	case R_SPARC_64:
@@ -2737,6 +2741,7 @@ _bfd_sparc_elf_relocate_section (bfd *output_bfd,
 	case R_SPARC_LO10:
 	case R_SPARC_UA16:
 	case R_SPARC_UA32:
+	case R_SPARC_9:
 	case R_SPARC_10:
 	case R_SPARC_11:
 	case R_SPARC_64:

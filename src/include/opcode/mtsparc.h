@@ -190,6 +190,9 @@ typedef struct sparc_opcode
 	_	Ancillary state register in rd (v9a)
 	/	Ancillary state register in rs1 (v9a)
 
+	LKO
+	^ 9-bit Immediate. v8-uT
+
   The following chars are unused: (note: ,[] are used as punctuation)
   [45].  */
 
