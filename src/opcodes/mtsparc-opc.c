@@ -875,6 +875,40 @@ const struct sparc_opcode sparc_opcodes[] = {
 { "rd",	F3(2, 0x28, 0)|RS1(24),		F3(~2, ~0x28, ~0)|RS1(~24)|SIMM13(~0),	"/,d", 0, v9b }, /* rd %sys_tick,r */
 { "rd",	F3(2, 0x28, 0)|RS1(25),		F3(~2, ~0x28, ~0)|RS1(~25)|SIMM13(~0),	"/,d", 0, v9b }, /* rd %sys_tick_cmpr,r */
 
+
+/* LKO: 16.04.2009 - micro-threaded instructions */
+{ "allocate",   F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x1), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x1),            "d", 0, v8 },   /* allocate %reg_rd - RS1 = %ASR20 */
+{ "create",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x2), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x2),            "2,d", 0, v8 }, /* create %reg_rs2, %reg_rd - RS1 = %ASR20 */
+
+{ "gettid",   F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x3), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x3),            "d", 0, v8 },   /* gettid %reg_rd - RS1 = %ASR20 */
+
+{ "getfid",   F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x4), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x4),            "d", 0, v8 },   /* getfid %reg_rd - RS1 = %ASR20 */
+
+{ "setstart",   F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x2),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x2)|ASI_UT(~0),  "1,2", 0, v8 }, /* setstart %reg_rs1, %reg_rs2 - RD = %ASR20 */
+{ "setstart",   F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x2),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x2),             "1,^", 0, v8 }, /* setstart %reg_rs1, imm9     - RD = %ASR20 */
+
+{ "setlimit",   F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x3),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x3)|ASI_UT(~0),  "1,2", 0, v8 }, /* setlimit %reg_rs1, %reg_rs2 - RD = %ASR20 */
+{ "setlimit",   F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x3),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x3),             "1,^", 0, v8 }, /* setlimit %reg_rs1, imm9     - RD = %ASR20 */
+
+{ "setstep",    F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x4),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x4)|ASI_UT(~0),  "1,2", 0, v8 }, /* setstep %reg_rs1, %reg_rs2 - RD = %ASR20 */
+{ "setstep",    F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x4),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x4),             "1,^", 0, v8 }, /* setstep %reg_rs1, imm9     - RD = %ASR20 */
+
+{ "setblock",   F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x5),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x5)|ASI_UT(~0),  "1,2", 0, v8 }, /* setblock %reg_rs1, %reg_rs2 - RD = %ASR20 */
+{ "setblock",   F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x5),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x5),             "1,^", 0, v8 }, /* setblock %reg_rs1, imm9     - RD = %ASR20 */
+
+{ "setthread",  F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x6)|ASI_UT(~0),  "1,2", 0, v8 }, /* setthread %reg_rs1, %reg_rs2 - RD = %ASR20 */
+{ "setthread",  F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x6),             "1,^", 0, v8 }, /* setthread %reg_rs1, imm9     - RD = %ASR20 */
+
+{ "setregg",    F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x8),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x8)|ASI_UT(~0),  "1,2", 0, v8 }, /* setregg %reg_rs1, %reg_rs2 - RD = %ASR20 */
+{ "setregg",    F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x8),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x8),             "1,^", 0, v8 }, /* setregg %reg_rs1, imm9     - RD = %ASR20 */
+
+{ "setregs",    F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x9),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x9)|ASI_UT(~0),  "1,2", 0, v8 }, /* setregs %reg_rs1, %reg_rs2 - RD = %ASR20 */
+{ "setregs",    F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x9),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x9),             "1,^", 0, v8 }, /* setregs %reg_rs1, imm9     - RD = %ASR20 */
+
+{ "break", 			F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xA),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xA)|ASI_UT(~0),  "2", 0, v8 }, /* break %reg_rs2 - RD = %ASR20 */
+{ "break", 			F3(2, 0x30, 1)|RD(0x14)|OP_UT(0xA),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0xA),             "^", 0, v8 }, /* break imm9     - RD = %ASR20 */
+
+
 { "rdpr",	F3(2, 0x2a, 0),		F3(~2, ~0x2a, ~0)|SIMM13(~0),	"?,d", 0, v9 },   /* rdpr %priv,r */
 { "wrpr",	F3(2, 0x32, 0),		F3(~2, ~0x32, ~0),		"1,2,!", 0, v9 }, /* wrpr r1,r2,%priv */
 { "wrpr",	F3(2, 0x32, 0),		F3(~2, ~0x32, ~0)|SIMM13(~0),	"1,!", 0, v9 },   /* wrpr r1,%priv */
@@ -1009,17 +1043,17 @@ const struct sparc_opcode sparc_opcodes[] = {
 { "addccc",	F3(2, 0x18, 1), F3(~2, ~0x18, ~1),		"1,i,d", 0, v9 },
 { "addccc",	F3(2, 0x18, 1), F3(~2, ~0x18, ~1),		"i,1,d", 0, v9 },
 
-{ "allocate", F3(2, 0x09, 0), F3(~2, ~0x09, ~0)|RS1_G0|ASI(~0), "2,d", 0, v6 },
-{ "allocate", F3(2, 0x09, 1), F3(~2, ~0x09, ~1)|RS1_G0,         "i,d", 0, v6 },
+{ "allocate_ng", F3(2, 0x09, 0), F3(~2, ~0x09, ~0)|RS1_G0|ASI(~0), "2,d", 0, v6 },
+{ "allocate_ng", F3(2, 0x09, 1), F3(~2, ~0x09, ~1)|RS1_G0,         "i,d", 0, v6 },
 
-{ "setstart",	F3(2, 0x2c, 0), F3(~2, ~0x2c, ~0)|ASI(~0),	"1,2", 0, v6 },
-{ "setstart",	F3(2, 0x2c, 1), F3(~2, ~0x2c, ~1),		    "1,i", 0, v6 },
-{ "setlimit",	F3(2, 0x2d, 0), F3(~2, ~0x2d, ~0)|ASI(~0),	"1,2", 0, v6 },
-{ "setlimit",	F3(2, 0x2d, 1), F3(~2, ~0x2d, ~1),		    "1,i", 0, v6 },
-{ "setstep",	F3(2, 0x2e, 0), F3(~2, ~0x2e, ~0)|ASI(~0),	"1,2", 0, v6 },
-{ "setstep",	F3(2, 0x2e, 1), F3(~2, ~0x2e, ~1),	    	"1,i", 0, v6 },
-{ "setblock",	F3(2, 0x2f, 0), F3(~2, ~0x2f, ~0)|ASI(~0),	"1,2", 0, v6 },
-{ "setblock",	F3(2, 0x2f, 1), F3(~2, ~0x2f, ~1),		    "1,i", 0, v6 },
+{ "setstart_ng",	F3(2, 0x2c, 0), F3(~2, ~0x2c, ~0)|ASI(~0),	"1,2", 0, v6 },
+{ "setstart_ng",	F3(2, 0x2c, 1), F3(~2, ~0x2c, ~1),		    "1,i", 0, v6 },
+{ "setlimit_ng",	F3(2, 0x2d, 0), F3(~2, ~0x2d, ~0)|ASI(~0),	"1,2", 0, v6 },
+{ "setlimit_ng",	F3(2, 0x2d, 1), F3(~2, ~0x2d, ~1),		    "1,i", 0, v6 },
+{ "setstep_ng",	F3(2, 0x2e, 0), F3(~2, ~0x2e, ~0)|ASI(~0),	"1,2", 0, v6 },
+{ "setstep_ng",	F3(2, 0x2e, 1), F3(~2, ~0x2e, ~1),	    	"1,i", 0, v6 },
+{ "setblock_ng",	F3(2, 0x2f, 0), F3(~2, ~0x2f, ~0)|ASI(~0),	"1,2", 0, v6 },
+{ "setblock_ng",	F3(2, 0x2f, 1), F3(~2, ~0x2f, ~1),		    "1,i", 0, v6 },
 { "print",	    F3(2, 0x37, 0), F3(~2, ~0x37, ~0)|ASI(~0),	"1,2", 0, v6 },
 { "print",	    F3(2, 0x37, 1), F3(~2, ~0x37, ~1),		    "1,i", 0, v6 },
 { "ldbp",	    F3(2, 0x3E, 0), F3(~2, ~0x3E, ~0)|RS1_G0|ASI_RS2(~0), "d", 0, v6 }, /* ldbp d */

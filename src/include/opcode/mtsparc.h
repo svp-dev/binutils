@@ -218,6 +218,11 @@ typedef struct sparc_opcode
 #define MEMBAR(x)	((x) & 0x7f)
 #define SLCPOP(x)	(((x) & 0x7f) << 6)  /* Sparclet cpop.  */
 
+/* LKO: 19.04.2009 */
+#define OP_UT(x)  (((x) & 0xf) << 9)  /* micro-threaded mode OP */
+#define SIMM9(x)  ((x) & 0x1ff)       /* Simm9 field.  */
+#define ASI_UT(x) (((x) & 0xf) << 5)  /* Asi field of format3 insns.  */
+
 #define ANNUL	(1 << 29)
 #define BPRED	(1 << 19)	/* V9.  */
 #define	IMMED	F3I (1)
