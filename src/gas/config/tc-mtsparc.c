@@ -1809,6 +1809,12 @@ sparc_ip (str, pinsn)
 	      the_insn.reloc = BFD_RELOC_SPARC_10;
 	      goto immediate;
 
+// LKO
+	    case '^':
+	      the_insn.reloc = BFD_RELOC_SPARC_9;
+	      goto immediate;
+
+
 	    case 'X':
 	      /* V8 systems don't understand BFD_RELOC_SPARC_5.  */
 	      if (SPARC_OPCODE_ARCH_V9_P (max_architecture))
@@ -3506,6 +3512,14 @@ md_apply_fix (fixP, valP, segment)
 	  insn |= val & 0x3ff;
 	  break;
 
+	case BFD_RELOC_SPARC_9:  // LKO
+	  if (! in_signed_range (val, 0x1ff))
+	    as_bad_where (fixP->fx_file, fixP->fx_line,
+			  _("relocation overflow"));
+	  insn |= val & 0x1ff;
+	  break;
+
+
 	case BFD_RELOC_SPARC_7:
 	  if (! in_bitfield_range (val, 0x7f))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
@@ -3687,6 +3701,7 @@ tc_gen_reloc (section, fixp)
     case BFD_RELOC_SPARC_5:
     case BFD_RELOC_SPARC_6:
     case BFD_RELOC_SPARC_7:
+    case BFD_RELOC_SPARC_9: // LKO
     case BFD_RELOC_SPARC_10:
     case BFD_RELOC_SPARC_11:
     case BFD_RELOC_SPARC_HH22:

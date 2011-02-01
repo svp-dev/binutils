@@ -612,6 +612,7 @@ guess_is_rela (unsigned long e_machine)
     case EM_68K:
     case EM_860:
     case EM_ALPHA:
+    case EM_MTALPHA:
     case EM_ALTERA_NIOS2:
     case EM_AVR:
     case EM_AVR_OLD:
@@ -649,6 +650,7 @@ guess_is_rela (unsigned long e_machine)
     case EM_S390:
     case EM_S390_OLD:
     case EM_SH:
+    case EM_MTSPARC:
     case EM_SPARC:
     case EM_SPARC32PLUS:
     case EM_SPARCV9:
@@ -1010,6 +1012,7 @@ dump_relocations (FILE *file,
 	case EM_SPARC32PLUS:
 	case EM_SPARCV9:
 	case EM_SPARC:
+	case EM_MTSPARC:
 	  rtype = elf_sparc_reloc_type (type);
 	  break;
 
@@ -1091,6 +1094,7 @@ dump_relocations (FILE *file,
 	  break;
 
 	case EM_ALPHA:
+    case EM_MTALPHA:
 	  rtype = elf_alpha_reloc_type (type);
 	  break;
 
@@ -1206,7 +1210,7 @@ dump_relocations (FILE *file,
       else
 	printf (do_wide ? "%-22.22s" : "%-17.17s", rtype);
 
-      if (elf_header.e_machine == EM_ALPHA
+      if ((elf_header.e_machine == EM_ALPHA || elf_header.e_machine == EM_MTALPHA)
 	  && rtype != NULL
 	  && streq (rtype, "R_ALPHA_LITUSE")
 	  && is_rela)
@@ -1613,6 +1617,7 @@ get_dynamic_type (unsigned long type)
 	      result = get_ia64_dynamic_type (type);
 	      break;
 	    case EM_ALPHA:
+	    case EM_MTALPHA:
 	      result = get_alpha_dynamic_type (type);
 	      break;
 	    case EM_SCORE:
@@ -1691,6 +1696,7 @@ get_machine_name (unsigned e_machine)
     case EM_NONE:		return _("None");
     case EM_M32:		return "WE32100";
     case EM_SPARC:		return "Sparc";
+    case EM_MTSPARC:	return "Microthread Sparc";
     case EM_SPU:		return "SPU";
     case EM_386:		return "Intel 80386";
     case EM_68K:		return "MC68000";
@@ -1726,6 +1732,7 @@ get_machine_name (unsigned e_machine)
     case EM_COLDFIRE:		return "Motorola Coldfire";
     case EM_68HC12:		return "Motorola M68HC12";
     case EM_ALPHA:		return "Alpha";
+    case EM_MTALPHA:	return "Microthread Alpha";
     case EM_CYGNUS_D10V:
     case EM_D10V:		return "d10v";
     case EM_CYGNUS_D30V:
@@ -7060,6 +7067,7 @@ process_symbol_table (FILE *file)
       int hash_ent_size = 4;
 
       if ((elf_header.e_machine == EM_ALPHA
+       || elf_header.e_machine == EM_MTALPHA
 	   || elf_header.e_machine == EM_S390
 	   || elf_header.e_machine == EM_S390_OLD)
 	  && elf_header.e_ident[EI_CLASS] == ELFCLASS64)
@@ -9190,7 +9198,9 @@ get_netbsd_elfcore_note_type (unsigned e_type)
 
     case EM_OLD_ALPHA:
     case EM_ALPHA:
+    case EM_MTALPHA:
     case EM_SPARC:
+    case EM_MTSPARC:
     case EM_SPARC32PLUS:
     case EM_SPARCV9:
       switch (e_type)

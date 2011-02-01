@@ -188,6 +188,9 @@ typedef struct sparc_opcode
 	_	Ancillary state register in rd (v9a)
 	/	Ancillary state register in rs1 (v9a)
 
+	LKO
+	^ 9-bit Immediate. v8-uT
+
   The following chars are unused: (note: ,[] are used as punctuation)
   [45].  */
 
@@ -210,6 +213,12 @@ typedef struct sparc_opcode
 #define ASI_RS2(x)	(SIMM13 (x))
 #define MEMBAR(x)	((x) & 0x7f)
 #define SLCPOP(x)	(((x) & 0x7f) << 6)  /* Sparclet cpop.  */
+
+/* Microthreading ext -- LKO: 19.04.2009 */
+#define OP_UT(x)  (((x) & 0xf) << 9)  /* micro-threaded mode OP */
+#define SIMM9(x)  ((x) & 0x1ff)       /* Simm9 field.  */
+#define ASI_UT(x) (((x) & 0xf) << 5)  /* Asi field of format3 insns.  */
+/* -- */
 
 #define ANNUL	(1 << 29)
 #define BPRED	(1 << 19)	/* V9.  */

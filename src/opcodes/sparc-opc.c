@@ -876,6 +876,12 @@ const struct sparc_opcode sparc_opcodes[] = {
 { "rd",	F3(2, 0x28, 0)|RS1(24),		F3(~2, ~0x28, ~0)|RS1(~24)|SIMM13(~0),	"/,d", 0, v9b }, /* rd %sys_tick,r */
 { "rd",	F3(2, 0x28, 0)|RS1(25),		F3(~2, ~0x28, ~0)|RS1(~25)|SIMM13(~0),	"/,d", 0, v9b }, /* rd %sys_tick_cmpr,r */
 
+/* Microthreading ext -- LKO: 16.04.2009 */
+{ "launch",     F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x1),  
+                                        F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x1)|ASI_UT(~0),  
+                                                                        "1", 0, v8 },     /* launch %reg_rs1  - RD = %ASR20 */
+/* -- */
+
 { "rdpr",	F3(2, 0x2a, 0),		F3(~2, ~0x2a, ~0)|SIMM13(~0),	"?,d", 0, v9 },   /* rdpr %priv,r */
 { "wrpr",	F3(2, 0x32, 0),		F3(~2, ~0x32, ~0),		"1,2,!", 0, v9 }, /* wrpr r1,r2,%priv */
 { "wrpr",	F3(2, 0x32, 0),		F3(~2, ~0x32, ~0)|SIMM13(~0),	"1,!", 0, v9 },   /* wrpr r1,%priv */
