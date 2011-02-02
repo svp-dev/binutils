@@ -881,6 +881,9 @@ const struct sparc_opcode sparc_opcodes[] = {
 
 
 /* LKO: 16.04.2009 - micro-threaded instructions */
+{ "launch",     F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x1),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x1)|ASI_UT(~0),  "1", 0, v8 }, /* launch %reg_rs1  - R
+                                                                                                                                D = %ASR20 */
+
 { "allocate",   F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x1), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x1),            "d", 0, v8 },   /* allocate %reg_rd - RS1 = %ASR20 */
 { "create",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x2), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x2),            "2,d", 0, v8 }, /* create %reg_rs2, %reg_rd - RS1 = %ASR20 */
 
