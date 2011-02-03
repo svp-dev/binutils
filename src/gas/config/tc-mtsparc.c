@@ -140,6 +140,7 @@ static void s_seg PARAMS ((int));
 static void s_proc PARAMS ((int));
 static void s_reserve PARAMS ((int));
 static void s_registers PARAMS ((int));
+static void s_noregisters PARAMS ((int));
 static void s_common PARAMS ((int));
 static void s_empty PARAMS ((int));
 static void s_uacons PARAMS ((int));
@@ -190,6 +191,7 @@ const pseudo_typeS md_pseudo_table[] =
   {"optim", s_ignore, 0},
   {"proc", s_proc, 0},
   {"registers", s_registers, 0},
+  {"noregisters", s_noregisters, 0},
   {"reserve", s_reserve, 0},
   {"section", s_mtsparc_section, 0},
   {"section.s", s_mtsparc_section, 0},
@@ -4009,6 +4011,13 @@ s_registers(ignore)
 
   /* Update global current register counts */
   register_counts = counts;
+}
+
+static void
+s_noregisters(ignore)
+    int ignore ATTRIBUTE_UNUSED;
+{
+    register_counts.valid = 0;
 }
 
 static void
