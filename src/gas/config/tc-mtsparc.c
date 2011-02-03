@@ -1406,6 +1406,23 @@ md_assemble (str)
   if (insn == NULL)
     return;
 
+  /* Delayed ops cannot be the last on a cache line */
+  if ((insn->flags & F_DELAYED) != 0 
+      && (function_offset % 64) == (64-4))
+  {
+      if (last_insn != NULL
+          && (last_insn->flags & F_DELAYED) != 0)
+      {
+          as_fatal("unsupported: branch in delay slot at end of cache line");
+      }
+      struct sparc_it nop_insn;
+
+      nop_insn.opcode = NOP_INSN;
+      nop_insn.reloc = BFD_RELOC_NONE;
+      output_insn (insn, &nop_insn);
+      as_warn ("branch at end of cache line; NOP inserted");
+  }
+
   /* We warn about attempts to put a floating point branch in a delay slot,
      unless the delay slot has been annulled.  */
   if (last_insn != NULL
