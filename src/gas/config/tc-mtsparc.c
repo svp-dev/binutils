@@ -1493,6 +1493,7 @@ sparc_ip (str, pinsn)
   int comma = 0;
   int v9_arg_p;
   int special_case = SPECIAL_CASE_NONE;
+  unsigned base, count;
 
   s = str;
   if (ISLOWER (*s))
@@ -2120,94 +2121,88 @@ sparc_ip (str, pinsn)
 	    case '1':
 	    case '2':
 	    case 'd':
-	      if (*s++ == '%')
+              if (*s++ == '%')
 		{
-		  switch (c = *s++)
-		    {
-
+                  switch (c = *s++)
+		    {                      
 		    case 'f':	/* frame pointer */
 		      if (*s++ == 'p')
 			{
 			  mask = 0x1e;
+                          if (register_counts.valid) as_warn("using legacy register name in Microthreaded mode");
 			  break;
 			}
 		      goto error;
 
-			case 'd':	/* dependent register */
-		      if (register_counts.valid)
-			{
-			  if (ISDIGIT(c = *s++))
-			  {
-			    c -= '0';
-		        if (ISDIGIT (*s)) {
-			   	    c = 10 * c + (*s++ - '0');
-				}
-		   	    if (c >= register_counts.ints.shared) {
-		      	  goto error;
-		    	}
-		    	c = register_counts.ints.shared - 1 - c;
-		      	mask = 31 - (c + register_counts.ints.global +
-		      		register_counts.ints.shared + register_counts.ints.local);
-		      	break;
-		      }
-			}
-  	        goto error;
-			
+                    case 't': /* thread register */
+                      if (!register_counts.valid)
+                        goto error;
+                      
+                      switch(*s++)
+                        {
+                        case 'l':
+                          base = 1;
+                          count = register_counts.ints.local;
+                          break;
+
+                        case 'g':
+                          base = 1+register_counts.ints.local;
+                          count = register_counts.ints.global;
+                          break;
+                          
+                        case 's':
+                          base = 1+register_counts.ints.local + register_counts.ints.global;
+                          count = register_counts.ints.shared;
+                          break;
+                          
+                        case 'd':
+                          base = 1+register_counts.ints.global + register_counts.ints.shared + register_counts.ints.local;
+                          count = register_counts.ints.shared;
+                          break;
+
+                        default:
+                          goto error;
+                        }
+                                           
+                      if (ISDIGIT(c = *s++))
+                        {
+                          c -= '0';
+                          if (ISDIGIT (*s)) {
+                            c = 10 * c + (*s++ - '0');
+                          }
+                        }
+                      
+                      if (c >= count)
+                        goto error;
+                      mask = base + c;
+                      break;
+                      
 		    case 'g':	/* global register */
 		      c = *s++;
-		    if (register_counts.valid)
-			{
-			  if (ISDIGIT(c))
-			  {
-  			  	c -= '0';
-		      	if (ISDIGIT (*s)) {
-			      c = 10 * c + (*s++ - '0');
-			    }
-		  	  	if (c >= register_counts.ints.global) {
-		          goto error;
-		        }
-		        c = register_counts.ints.global - 1 - c;
-		        mask = 31 - c;
-		        break;
-		      }
-			}
-		    else if (isoctal (c))
+                      if (isoctal (c))
 			{
 			  mask = c - '0';
+                          if (register_counts.valid) as_warn("using legacy register name in Microthreaded mode");
 			  break;
 			}
 		      goto error;
-
+                      
 		    case 'i':	/* in register */
 		      c = *s++;
 		      if (isoctal (c))
 			{
 			  mask = c - '0' + 24;
+                          if (register_counts.valid) as_warn("using legacy register name in Microthreaded mode");
 			  break;
 			}
 		      goto error;
 
 		    case 'l':	/* local register */
 		      c = *s++;
-		    if (register_counts.valid)
-			{
-			  if (ISDIGIT(c))
-			  {
-			  	c -= '0';
-		     	if (ISDIGIT (*s)) {
-			  	  c = 10 * c + (*s++ - '0');
-				}
-		  	  	if (c >= register_counts.ints.local) {
-		      	  goto error;
-		    	}
-		      	c = register_counts.ints.local - 1 - c;
-		      	mask = 31 - (c + register_counts.ints.global + register_counts.ints.shared);
-		      	break;
-			  }
-			}
-		    else if (isoctal (c))
+                      if (isoctal (c))
 			{
 			  mask = (c - '0' + 16);
+                          if (register_counts.valid) as_warn("using legacy register name in Microthreaded mode");
 			  break;
 			}
 		      goto error;
@@ -2217,33 +2212,19 @@ sparc_ip (str, pinsn)
 		      if (isoctal (c))
 			{
 			  mask = (c - '0' + 8);
+                          if (register_counts.valid) as_warn("using legacy register name in Microthreaded mode");
 			  break;
 			}
 		      goto error;
 
 		    case 's':	/* stack pointer */
-		    if ((c = *s++) == 'p')
+                      if ((c = *s++) == 'p')
 			{
 			  mask = 0xe;
+                          if (register_counts.valid) as_warn("using legacy register name in Microthreaded mode");
 			  break;
 			}
-		    else if (register_counts.valid)
-			{
-			  if (ISDIGIT(c))
-			  {
-			  	c -= '0';
-		      	if (ISDIGIT (*s)) {
-			  	  c = 10 * c + (*s++ - '0');
-				}
-		  	  	if (c >= register_counts.ints.shared) {
-		      	  goto error;
-		    	}
-		    	c = register_counts.ints.shared - 1 - c;
-		      	mask = 31 - (c + register_counts.ints.global);
-		      	break;
-			  }
-			}
-		      goto error;
+                      goto error;
 
 		    case 'r':	/* any register */
 		      if (!ISDIGIT ((c = *s++)))
@@ -2323,132 +2304,132 @@ sparc_ip (str, pinsn)
 	    case 'J':
 	      {
 		char format;
-
-		if (*s++ == '%'
-		    && (((format = *s) == 'f') ||
-		      (register_counts.valid && ((format = *s) == 'l' || *s == 's' || *s == 'g' || *s == 'd') && *++s == 'f'))
-		    && ISDIGIT (*++s))
-		  {
-		    unsigned int base, count;
-		    
-		    for (mask = 0; ISDIGIT (*s); ++s)
-		      {
-			mask = 10 * mask + (*s - '0');
-		      }		/* read the number */
-
-			switch (format)
-			{
-			case 's':
-			  	count = register_counts.flts.shared;
-			   	base  = register_counts.flts.global;
-			   	break;
-			case 'd':
-			  	count = register_counts.flts.shared;
-			   	base  = register_counts.flts.global + register_counts.flts.shared + register_counts.flts.local;
-			  	break;
-			case 'g':
-			   	count = register_counts.flts.global;
-			   	base  = 0;
-			   	break;
-			case 'l':
-			   	count = register_counts.flts.local;
-			   	base  = register_counts.flts.global + register_counts.flts.shared;
-			   	break;
-			default:
-			    count = 1024;  /* Just a very high number */
-			    base  = 0;
-				break;
-			}
-		    
-		    if (mask >= count)
-			{
-			    break;
-			}
-			
-		    if ((*args == 'v'
-			 || *args == 'B'
-			 || *args == 'H')
-			&& ((mask & 1) || (mask + 2 > count)))
-		      {
-			break;
-		      }		/* register must be even numbered */
-
-		    if ((*args == 'V'
-			 || *args == 'R'
-			 || *args == 'J')
-			&& ((mask & 3) || (mask + 4 > count)))
-		      {
-			break;
-		      }		/* register must be multiple of 4 */
-
-			if (count != 1024) {
-			    /* uThread registers (LSGD) have to be reversed */
-			    mask = 31 - (count - 1 - mask + base);
-			} else {
-			    mask = mask + base;
-			}
-			format = 'f';			
-	        
-		    if (mask >= 64)
-		      {
-			if (SPARC_OPCODE_ARCH_V9_P (max_architecture))
-			  error_message = _(": There are only 64 f registers; [0-63]");
-			else
-			  error_message = _(": There are only 32 f registers; [0-31]");
-			goto error;
-		      }	/* on error */
-		    else if (mask >= 32)
-		      {
-			if (SPARC_OPCODE_ARCH_V9_P (max_architecture))
-			  {
-			    if (*args == 'e' || *args == 'f' || *args == 'g')
-			      {
-				error_message
-				  = _(": There are only 32 single precision f registers; [0-31]");
-				goto error;
-			      }
-			    v9_arg_p = 1;
-			    mask -= 31;	/* wrap high bit */
-			  }
-			else
-			  {
-			    error_message = _(": There are only 32 f registers; [0-31]");
-			    goto error;
-			  }
-		      }
-		  }
-		else
-		  {
-		    break;
-		  }	/* if not an 'f' register.  */
-
-		switch (*args)
-		  {
-		  case 'v':
-		  case 'V':
-		  case 'e':
-		    opcode |= RS1 (mask);
-		    continue;
-
-		  case 'f':
-		  case 'B':
-		  case 'R':
-		    opcode |= RS2 (mask);
-		    continue;
-
-		  case 'g':
-		  case 'H':
-		  case 'J':
-		    opcode |= RD (mask);
-		    continue;
-		  }		/* Pack it in.  */
-
-		know (0);
-		break;
-	      }			/* float arg  */
-
-	    case 'F':
-	      if (strncmp (s, "%fsr", 4) == 0)
+                
+                if (*s++ != '%') goto error;
+                
+                if (*s == 't') 
+                  { 
+                    ++s; 
+                    if (!register_counts.valid) goto error; 
+                  }
+                else
+                  if (register_counts.valid) as_warn("using legacy register name in Microthreaded mode");
+                
+                switch (format = *s)
+                  {
+                  case 'd': case 'l': case 'g': case 's': if (!register_counts.valid) goto error;
+                  case 'f': break;
+                  default: goto error;
+                  }
+                if (!ISDIGIT(*++s)) goto error;
+                
+                for (mask = 0; ISDIGIT (*s); ++s)
+                  {
+                    mask = 10 * mask + (*s - '0');
+                  }		/* read the number */
+                
+                switch(format)
+                  {
+                  case 'l':
+                    base = 1;
+                    count = register_counts.flts.local;
+                    break;
+                    
+                  case 'g':
+                    base = 1+register_counts.flts.local;
+                    count = register_counts.flts.global;
+                    break;
+                    
+                  case 's':
+                    base = 1+register_counts.flts.local + register_counts.flts.global;
+                    count = register_counts.flts.shared;
+                    break;
+                    
+                  case 'd':
+                    base = 1+register_counts.flts.global + register_counts.flts.shared + register_counts.flts.local;
+                    count = register_counts.flts.shared;
+                    break;
+                    
+                  default:
+                    goto error;
+                  }
+                
+                if (mask >= count)
+                  goto error;
+                mask = base + mask;
+                
+                if ((*args == 'v'
+                     || *args == 'B'
+                     || *args == 'H')
+                    && ((mask & 1) || (mask + 1 > count)))
+                  {
+                    break;
+                  }		/* register must be even numbered */
+                
+                if ((*args == 'V'
+                     || *args == 'R'
+                     || *args == 'J')
+                    && ((mask & 3) || (mask + 3 > count)))
+                  {
+                    break;
+                  }		/* register must be multiple of 4 */
+                
+                if (mask >= 64)
+                  {
+                    if (SPARC_OPCODE_ARCH_V9_P (max_architecture))
+                      error_message = _(": There are only 64 f registers; [0-63]");
+                    else
+                      error_message = _(": There are only 32 f registers; [0-31]");
+                    goto error;
+                  }	/* on error */
+                else if (mask >= 32)
+                  {
+                    if (SPARC_OPCODE_ARCH_V9_P (max_architecture))
+                      {
+                        if (*args == 'e' || *args == 'f' || *args == 'g')
+                          {
+                            error_message
+                              = _(": There are only 32 single precision f registers; [0-31]");
+                            goto error;
+                          }
+                        v9_arg_p = 1;
+                        mask -= 31;	/* wrap high bit */
+                      }
+                    else
+                      {
+                        error_message = _(": There are only 32 f registers; [0-31]");
+                        goto error;
+                      }
+                  }
+              
+              
+                switch (*args)
+                  {
+                  case 'v':
+                  case 'V':
+                  case 'e':
+                    opcode |= RS1 (mask);
+                  continue;
+                  
+                  case 'f':
+                  case 'B':
+                  case 'R':
+                    opcode |= RS2 (mask);
+                  continue;
+                  
+                  case 'g':
+                  case 'H':
+                  case 'J':
+                    opcode |= RD (mask);
+                  continue;
+                  }		/* Pack it in.  */
+                
+                know (0);
+                break;
+              }			/* float arg  */
+          
+        case 'F':
+          if (strncmp (s, "%fsr", 4) == 0)
 		{
 		  s += 4;
 		  continue;
