@@ -2323,7 +2323,7 @@ sparc_ip (str, pinsn)
 		char format;
                 
                 if (*s++ != '%') goto error;
-                
+
                 if (*s == 't') 
                   { 
                     ++s; 
@@ -2334,12 +2334,20 @@ sparc_ip (str, pinsn)
                 
                 switch (format = *s)
                   {
-                  case 'd': case 'l': case 'g': case 's': if (!register_counts.valid) goto error;
-                  case 'f': break;
-                  default: goto error;
+                  case 'd': case 'l': case 'g': case 's': 
+                      if (!register_counts.valid) goto error;
+                      ++s;
+                      break;
+                  case 'f': 
+                      break;
+                  default: 
+                      goto error;
                   }
+
+                if (*s != 'f') goto error;
+
                 if (!ISDIGIT(*++s)) goto error;
-                
+
                 for (mask = 0; ISDIGIT (*s); ++s)
                   {
                     mask = 10 * mask + (*s - '0');
@@ -2347,6 +2355,11 @@ sparc_ip (str, pinsn)
                 
                 switch(format)
                   {
+                  case 'f':
+                    base = 0;
+                    count = 31;
+                    break;
+
                   case 'l':
                     base = 1;
                     count = register_counts.flts.local;
@@ -2371,7 +2384,7 @@ sparc_ip (str, pinsn)
                     goto error;
                   }
                 
-                if (mask >= count)
+                if (register_counts.valid && mask >= count)
                   goto error;
                 mask = base + mask;
                 
