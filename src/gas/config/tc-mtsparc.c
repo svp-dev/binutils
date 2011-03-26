@@ -2466,8 +2466,7 @@ sparc_ip (str, pinsn)
 		}
 	      break;
 
-        case '<':
-        case '>':       /* 5-bit immediate, no relocations */
+        case '>':       /* 4-bit immediate, no relocations */
           goto immediate;
 
 	    case '0':		/* 64 bit immediate (set, setsw, setx insn)  */
@@ -2762,11 +2761,15 @@ sparc_ip (str, pinsn)
 		     all the various cases (e.g. in md_apply_fix and
 		     bfd_install_relocation) so duplicating all that code
 		     here isn't right.  */
-          switch (*args)
+          if (*args == '>')
           {
-            /* 5-bit immediate into rs2 or rd field */
-            case '<': opcode |= (the_insn.exp.X_add_number & 0x1f) << 0; break;
-            case '>': opcode |= (the_insn.exp.X_add_number & 0x1f) << 25; break;
+            /* 4-bit immediate into 4-bit ut-ASI field */
+            if (!in_unsigned_range(the_insn.exp.X_add_number, 0xf))
+            {
+              error_message = _(": immediate out of range");
+              goto error;
+            }
+            opcode |= (the_insn.exp.X_add_number & 0xf) << 5;
           }
 		}
 

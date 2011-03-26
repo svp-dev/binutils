@@ -140,14 +140,14 @@ typedef struct sparc_opcode
 	m	alternate space register (asr) in rd
 	M	alternate space register (asr) in rs1
 	h	22 high bits.
-	<   5 bit non-relocatable unsigned immediate in rs2
-	>   5 bit non-relocatable unsigned immediate in rd
+	>   4 bit non-relocatable unsigned immediate in ut-asi
 	X	5 bit unsigned immediate
 	Y	6 bit unsigned immediate
 	3	SIAM mode (3 bits). (v9b)
 	K	MEMBAR mask (7 bits). (v9)
 	j	10 bit Immediate. (v9)
 	I	11 bit Immediate. (v9)
+	^   9 bit Immediate. (v8-uT)
 	i	13 bit Immediate.
 	n	22 bit immediate.
 	k	2+14 bit PC relative immediate. (v9)
@@ -189,9 +189,6 @@ typedef struct sparc_opcode
 	0	32/64 bit immediate for set or setx (v9) insns
 	_	Ancillary state register in rd (v9a)
 	/	Ancillary state register in rs1 (v9a)
-
-	LKO
-	^ 9-bit Immediate. v8-uT
 
   The following chars are unused: (note: ,[] are used as punctuation)
   [45].  */

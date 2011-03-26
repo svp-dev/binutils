@@ -666,7 +666,7 @@ print_insn_mtsparc (bfd_vma memaddr, disassemble_info *info)
 		  case 'i':	/* 13 bit immediate.  */
 		  case 'I':	/* 11 bit immediate.  */
 		  case 'j':	/* 10 bit immediate.  */
-      case '^':     /* 9 bit immediate.  LKO */
+          case '^': /* 9 bit immediate. */
 		    {
 		      int imm;
 
@@ -677,7 +677,7 @@ print_insn_mtsparc (bfd_vma memaddr, disassemble_info *info)
           else if (*s == 'j')
 			imm = X_SIMM (insn, 10);
           else //if (*s == '^')
-            imm = X_IMM (insn, 9); //LKO : unsigned 9 bit immediate value
+            imm = X_IMM (insn, 9);
 
 		      /* Check to see whether we have a 1+i, and take
 			 note of that fact.
@@ -860,10 +860,9 @@ print_insn_mtsparc (bfd_vma memaddr, disassemble_info *info)
 		      (stream, "%#x", SEX (X_DISP22 (insn), 22));
 		    break;
 
-		  case '{': (*info->fprintf_func)(stream, "%#x", (insn >>  0) & 0x1f); break;
-		  case '}': (*info->fprintf_func)(stream, "%#x", (insn >>  5) & 0x1f); break;
-		  case '<': (*info->fprintf_func)(stream, "%#x", (insn >> 10) & 0x1f); break;
-		  case '>': (*info->fprintf_func)(stream, "%#x", (insn >> 15) & 0x1f); break;
+		  case '>':
+		    (*info->fprintf_func)(stream, "%#x", (insn >> 5) & 0xf);
+		    break;
 
 		  case 'l':
 		    info->target = memaddr + SEX (X_DISP22 (insn), 22) * 4;
