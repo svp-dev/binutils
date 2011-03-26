@@ -2391,17 +2391,17 @@ sparc_ip (str, pinsn)
                 if ((*args == 'v'
                      || *args == 'B'
                      || *args == 'H')
-                    && ((mask & 1) || (mask + 1 > count)))
+                    && ((mask & 1) || (mask + 1 >= base + count)))
                   {
-                    break;
+                    goto error;
                   }		/* register must be even numbered */
                 
                 if ((*args == 'V'
                      || *args == 'R'
                      || *args == 'J')
-                    && ((mask & 3) || (mask + 3 > count)))
+                    && ((mask & 3) || (mask + 3 >= base + count)))
                   {
-                    break;
+                    goto error;
                   }		/* register must be multiple of 4 */
                 
                 if (mask >= 64)
