@@ -506,8 +506,12 @@ const struct alpha_opcode mtalpha_opcodes[] =
 
 /*** MT extensions ***/
 
-  { "allocate", OPR (0x01,0x0), BASE, { ZA, RB,  RC } },
-  { "allocate", OPRL(0x01,0x0), BASE, { ZA, LIT, RC } },
+  { "allocate", OPR (0x01,0x0), BASE, { RA, RB,  RC } },
+  { "allocate", OPRL(0x01,0x0), BASE, { RA, LIT, RC } },
+  { "allocate/s", OPR (0x01,0x20), BASE, { RA, RB,  RC } },
+  { "allocate/s", OPRL(0x01,0x20), BASE, { RA, LIT, RC } },
+  { "allocate/x", OPR (0x01,0x60), BASE, { RA, RB,  RC } },
+  { "allocate/x", OPRL(0x01,0x60), BASE, { RA, LIT, RC } },
   { "setstart", OPR (0x01,0x1), BASE, { RA, RB,  ZC } },
   { "setstart", OPRL(0x01,0x1), BASE, { RA, LIT, ZC } },
   { "setlimit", OPR (0x01,0x2), BASE, { RA, RB,  ZC } },
@@ -520,7 +524,6 @@ const struct alpha_opcode mtalpha_opcodes[] =
   { "break",    OPR (0x01,0x6), BASE, ARG_NONE },
   { "ldbp",     OPRL(0x01,0x7), BASE, { ZA, ZB,  RC } },
   { "ldfp",     OPRL(0x01,0x8), BASE, { ZA, ZB,  RC } },
-  { "getprocs", OPRL(0x01,0x9), BASE, { ZA, ZB,  RC } },
   { "print",    OPR (0x01,0x10), BASE, { RA, RB,  ZC } },
   { "print",    OPRL(0x01,0x10), BASE, { RA, LIT, ZC } },
   { "putg",     OPR (0x01,0x11), BASE, { RB, RA,  IDXC} },
@@ -533,6 +536,10 @@ const struct alpha_opcode mtalpha_opcodes[] =
   { "release",  OPR (0x01,0x15), BASE, { RA, ZB,  ZC } }, /* alias */
   { "ioctl",    OPR (0x01,0x16), BASE, { RA, RB,  RC } },
   { "ioctl",    OPRL(0x01,0x16), BASE, { RA, LIT, RC } },
+  { "gettid",   OPRL(0x01,0x17), BASE, { ZA, ZB,  RC } },
+  { "getfid",   OPRL(0x01,0x18), BASE, { ZA, ZB,  RC } },
+  { "getpid",   OPRL(0x01,0x19), BASE, { ZA, ZB,  RC } },
+  { "getcid",   OPRL(0x01,0x1A), BASE, { ZA, ZB,  RC } },
 
   { "crei",     MEM (0x03), BASE, ARG_MEM },
 
