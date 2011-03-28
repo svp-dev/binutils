@@ -1420,7 +1420,7 @@ md_assemble (str)
       nop_insn.opcode = NOP_INSN;
       nop_insn.reloc = BFD_RELOC_NONE;
       output_insn (insn, &nop_insn);
-      as_warn ("branch at end of cache line; NOP inserted");
+      /* as_warn ("branch at end of cache line; NOP inserted"); */
   }
 
   /* We warn about attempts to put a floating point branch in a delay slot,
