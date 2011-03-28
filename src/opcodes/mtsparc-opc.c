@@ -884,10 +884,10 @@ const struct sparc_opcode sparc_opcodes[] = {
 { "allocate",   F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0x1), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0x1),            "^,d", 0, v8 }, /* allocate  imm9, rd */
 { "allocates",  F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x9), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x9)|RS2(~0)|ASI_UT(~0), "d", F_ALIAS, v8 }, /* allocates rd */
 { "allocates",  F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x9), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x9)|ASI_UT(~0), "2,d", 0, v8 }, /* allocates r2, rd */
-{ "allocates",  F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0x9), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0x9),            "2,d", 0, v8 }, /* allocates imm9, rd */
+{ "allocates",  F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0x9), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0x9),            "^,d", 0, v8 }, /* allocates imm9, rd */
 { "allocatex",  F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xa), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xa)|RS2(~0)|ASI_UT(~0), "d", F_ALIAS, v8 }, /* allocatex rd */
 { "allocatex",  F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xa), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xa)|ASI_UT(~0), "2,d", 0, v8 }, /* allocatex r2, rd */
-{ "allocatex",  F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0xa), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0xa),            "2,d", 0, v8 }, /* allocatex imm9, rd */
+{ "allocatex",  F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0xa), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0xa),            "^,d", 0, v8 }, /* allocatex imm9, rd */
 
 { "create",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x2), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x2),            "2,d", F_ALIAS, v8 }, /* sync r2, rd */
 { "sync",       F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x2), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x2),            "2,d", 0, v8 }, /* create r2, rd */
