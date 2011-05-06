@@ -1621,6 +1621,17 @@ alpha_align (int n,
      in a reloc for the linker to see.  */
 }
 
+/* This function gets called by read.c on alignments */
+int
+mtalpha_do_align (int n,
+        const char * fill,
+        int len ATTRIBUTE_UNUSED,
+        int max ATTRIBUTE_UNUSED)
+{
+    alpha_align(n, fill, NULL, 0);
+    return 0;
+}
+
 /* Actually output an instruction with its fixup.  */
 
 static void

@@ -53,6 +53,10 @@ struct alpha_reloc_tag;
 extern int mtalpha_force_relocation (struct fix *);
 extern int mtalpha_fix_adjustable   (struct fix *);
 
+extern int mtalpha_do_align PARAMS ((int, const char *, int, int));
+#define md_do_align(N, FILL, LEN, MAX, LABEL) \
+  if (mtalpha_do_align(N, FILL, LEN, MAX)) goto LABEL;
+
 extern unsigned long mtalpha_gprmask, mtalpha_fprmask;
 extern valueT mtalpha_gp_value;
 
