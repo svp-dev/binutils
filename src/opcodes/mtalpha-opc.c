@@ -540,6 +540,8 @@ const struct alpha_opcode mtalpha_opcodes[] =
   { "getfid",   OPRL(0x01,0x18), BASE, { ZA, ZB,  RC } },
   { "getpid",   OPRL(0x01,0x19), BASE, { ZA, ZB,  RC } },
   { "getcid",   OPRL(0x01,0x1A), BASE, { ZA, ZB,  RC } },
+  { "getasr",   OPRL(0x01,0x1B), BASE, { ZA, LIT, RC } },
+  { "getapr",   OPRL(0x01,0x1C), BASE, { ZA, LIT, RC } },
 
   { "crei",     MEM (0x03), BASE, ARG_MEM },
 
