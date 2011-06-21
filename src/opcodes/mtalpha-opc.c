@@ -542,7 +542,15 @@ const struct alpha_opcode mtalpha_opcodes[] =
   { "getcid",   OPRL(0x01,0x1A), BASE, { ZA, ZB,  RC } },
   { "getasr",   OPRL(0x01,0x1B), BASE, { ZA, LIT, RC } },
   { "getapr",   OPRL(0x01,0x1C), BASE, { ZA, LIT, RC } },
-
+  { "creba",    OPR (0x01,0x30), BASE, { RA, RB,  ZC } },
+  { "creba",    OPRL(0x01,0x30), BASE, { RA, LIT, ZC } },
+  { "crebas",   OPR (0x01,0x31), BASE, { RA, RB,  RC } },
+  { "crebas",   OPRL(0x01,0x31), BASE, { RA, LIT, RC } },
+  { "crebi",    OPR (0x01,0x32), BASE, { RA, RB,  ZC } },
+  { "crebi",    OPRL(0x01,0x32), BASE, { RA, LIT, ZC } },
+  { "crebis",   OPR (0x01,0x33), BASE, { RA, RB,  RC } },
+  { "crebis",   OPRL(0x01,0x33), BASE, { RA, LIT, RC } },
+  
   { "crei",     MEM (0x03), BASE, ARG_MEM },
 
   { "cred",     BRA (0x04), BASE, ARG_BRA },

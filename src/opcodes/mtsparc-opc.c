@@ -899,6 +899,11 @@ const struct sparc_opcode sparc_opcodes[] = {
 { "ldbp",       F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x7), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x7),            "d", 0, v8 },   /* ldbp rd */
 { "ldfp",       F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x8), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x8),            "d", 0, v8 },   /* ldfp rd */
 
+{ "crebas",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xE), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xE)|ASI_UT(~0),   "2,d", 0, v8 }, /* crebas r2,rd */
+{ "crebas",     F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0xE), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0xE),              "^,d", 0, v8 }, /* crebas imm9,rd */
+{ "crebis",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xF), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xF)|ASI_UT(~0),   "2,d", 0, v8 }, /* crebis r2,rd */
+{ "crebis",     F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0xF), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0xF),              "^,d", 0, v8 }, /* crebis imm9,rd */
+
 { "setstart",   F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x2),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x2)|ASI_UT(~0),  "1,2", 0, v8 }, /* setstart r1, r2 */
 { "setstart",   F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x2),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x2),             "1,^", 0, v8 }, /* setstart r1, imm9 */
 
@@ -915,6 +920,11 @@ const struct sparc_opcode sparc_opcodes[] = {
 { "setthread",  F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x6),             "1,^", F_ALIAS, v8 }, /* setthread r1, imm9 */
 { "crei",       F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x6)|ASI_UT(~0),  "2,1", 0,       v8 }, /* crei r2, r1 */
 { "cred",       F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x6),             "^,1", 0,       v8 }, /* cred imm9, r1 */
+
+{ "creba",      F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xE),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xE)|ASI_UT(~0),    "1,2", 0, v8 }, /* creba r1, r2 */
+{ "creba",      F3(2, 0x30, 1)|RD(0x14)|OP_UT(0xE),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0xE),               "1,^", 0, v8 }, /* creba r1, imm9 */
+{ "crebi",      F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xF),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xF)|ASI_UT(~0),    "1,2", 0, v8 }, /* crebi r1, r2 */
+{ "crebi",      F3(2, 0x30, 1)|RD(0x14)|OP_UT(0xF),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0xF),               "1,^", 0, v8 }, /* crebi r1, imm9 */
 
 { "putg",       F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x7),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x7),  "2,1,>", 0, v8 }, /* putg r2, r1, imm4 */
 { "puts",       F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x8),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x8),  "2,1,>", 0, v8 }, /* puts r2, r1, imm4 */
