@@ -877,72 +877,86 @@ const struct sparc_opcode sparc_opcodes[] = {
 
 
 /* Micro-threaded instructions */
-{ "launch",     F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x1),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x1)|ASI_UT(~0),  "1", 0, v8 },   /* launch r1 */
 
-{ "allocate",   F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x1), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x1)|RS2(~0)|ASI_UT(~0), "d", F_ALIAS, v8 }, /* allocate rd */
+/* rdasr %asr19 equivalents */
+{ "ldbp",       F3(2, 0x28, 0)|RS1(0x13)|OP_UT(0x1), F3(~2, ~0x28, ~0)|RS1(~0x13)|OP_UT(~0x1),            "d", 0, v8 },   /* ldbp rd */
+{ "ldfp",       F3(2, 0x28, 0)|RS1(0x13)|OP_UT(0x2), F3(~2, ~0x28, ~0)|RS1(~0x13)|OP_UT(~0x2),            "d", 0, v8 },   /* ldfp rd */
+
+{ "crebas",     F3(2, 0x28, 0)|RS1(0x13)|OP_UT(0x3), F3(~2, ~0x28, ~0)|RS1(~0x13)|OP_UT(~0x3)|ASI_UT(~0),   "2,d", 0, v8 }, /* crebas r2,rd */
+{ "crebas",     F3(2, 0x28, 1)|RS1(0x13)|OP_UT(0x3), F3(~2, ~0x28, ~1)|RS1(~0x13)|OP_UT(~0x3),              "^,d", 0, v8 }, /* crebas imm9,rd */
+
+{ "crebis",     F3(2, 0x28, 0)|RS1(0x13)|OP_UT(0x4), F3(~2, ~0x28, ~0)|RS1(~0x13)|OP_UT(~0x4)|ASI_UT(~0),   "2,d", 0, v8 }, /* crebis r2,rd */
+{ "crebis",     F3(2, 0x28, 1)|RS1(0x13)|OP_UT(0x4), F3(~2, ~0x28, ~1)|RS1(~0x13)|OP_UT(~0x4),              "^,d", 0, v8 }, /* crebis imm9,rd */
+
+/* rdasr $asr20 equivalents */
+{ "allocate",   F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x1), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x1)|RS2(~0)|ASI_UT(~0), "d", F_ALIAS, v8 }, /* allocate rd */  /* UTLEON3 */
 { "allocate",   F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x1), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x1)|ASI_UT(~0), "2,d", 0, v8 }, /* allocate  r2, rd */
 { "allocate",   F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0x1), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0x1),            "^,d", 0, v8 }, /* allocate  imm9, rd */
+
+{ "create",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x2), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x2),            "2,d", F_ALIAS, v8 }, /* create r2, rd */ /* UTLEON3 */
+{ "gettid",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x3), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x3),            "d", 0, v8 },   /* gettid rd */ /* UTLEON3 */
+{ "getfid",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x4), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x4),            "d", 0, v8 },   /* getfid rd */ /* UTLEON3 */
+
+{ "getpid",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x5), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x5),            "d", 0, v8 },   /* getpid rd */
+{ "getcid",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x6), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x6),            "d", 0, v8 },   /* getcid rd */
+
+{ "crei",       F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x7),  F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x7)|ASI_UT(~0),  "2,d", 0, v8 }, /* crei r2, rd */
+{ "cred",       F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0x7),  F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0x7),             "^,d", 0, v8 }, /* cred imm9, rd */
+
+{ "sync",       F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x8), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x8),            "2,d", 0, v8 }, /* create r2, rd */
+
 { "allocates",  F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x9), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x9)|RS2(~0)|ASI_UT(~0), "d", F_ALIAS, v8 }, /* allocates rd */
 { "allocates",  F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x9), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x9)|ASI_UT(~0), "2,d", 0, v8 }, /* allocates r2, rd */
 { "allocates",  F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0x9), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0x9),            "^,d", 0, v8 }, /* allocates imm9, rd */
-{ "allocatex",  F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xa), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xa)|RS2(~0)|ASI_UT(~0), "d", F_ALIAS, v8 }, /* allocatex rd */
-{ "allocatex",  F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xa), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xa)|ASI_UT(~0), "2,d", 0, v8 }, /* allocatex r2, rd */
-{ "allocatex",  F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0xa), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0xa),            "^,d", 0, v8 }, /* allocatex imm9, rd */
+{ "allocatex",  F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xA), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xA)|RS2(~0)|ASI_UT(~0), "d", F_ALIAS, v8 }, /* allocatex rd */
+{ "allocatex",  F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xA), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xA)|ASI_UT(~0), "2,d", 0, v8 }, /* allocatex r2, rd */
+{ "allocatex",  F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0xA), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0xA),            "^,d", 0, v8 }, /* allocatex imm9, rd */
 
-{ "create",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x2), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x2),            "2,d", F_ALIAS, v8 }, /* sync r2, rd */
-{ "sync",       F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x2), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x2),            "2,d", 0, v8 }, /* create r2, rd */
-
-{ "gettid",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x3), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x3),            "d", 0, v8 },   /* gettid rd */
-{ "getfid",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x4), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x4),            "d", 0, v8 },   /* getfid rd */
-{ "getpid",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x5), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x5),            "d", 0, v8 },   /* getpid rd */
-{ "getcid",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x6), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x6),            "d", 0, v8 },   /* getcid rd */
-{ "ldbp",       F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x7), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x7),            "d", 0, v8 },   /* ldbp rd */
-{ "ldfp",       F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0x8), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0x8),            "d", 0, v8 },   /* ldfp rd */
-
-{ "crebas",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xE), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xE)|ASI_UT(~0),   "2,d", 0, v8 }, /* crebas r2,rd */
-{ "crebas",     F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0xE), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0xE),              "^,d", 0, v8 }, /* crebas imm9,rd */
-{ "crebis",     F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xF), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xF)|ASI_UT(~0),   "2,d", 0, v8 }, /* crebis r2,rd */
-{ "crebis",     F3(2, 0x28, 1)|RS1(0x14)|OP_UT(0xF), F3(~2, ~0x28, ~1)|RS1(~0x14)|OP_UT(~0xF),              "^,d", 0, v8 }, /* crebis imm9,rd */
-
-{ "setstart",   F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x2),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x2)|ASI_UT(~0),  "1,2", 0, v8 }, /* setstart r1, r2 */
-{ "setstart",   F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x2),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x2),             "1,^", 0, v8 }, /* setstart r1, imm9 */
-
-{ "setlimit",   F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x3),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x3)|ASI_UT(~0),  "1,2", 0, v8 }, /* setlimit r1, r2 */
-{ "setlimit",   F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x3),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x3),             "1,^", 0, v8 }, /* setlimit r1, imm9 */
-
-{ "setstep",    F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x4),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x4)|ASI_UT(~0),  "1,2", 0, v8 }, /* setstep r1, r2 */
-{ "setstep",    F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x4),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x4),             "1,^", 0, v8 }, /* setstep r1, imm9 */
-
-{ "setblock",   F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x5),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x5)|ASI_UT(~0),  "1,2", 0, v8 }, /* setblock r1, r2 */
-{ "setblock",   F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x5),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x5),             "1,^", 0, v8 }, /* setblock r1, imm9 */
-
-{ "setthread",  F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x6)|ASI_UT(~0),  "1,2", F_ALIAS, v8 }, /* setthread r1, r2 */
-{ "setthread",  F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x6),             "1,^", F_ALIAS, v8 }, /* setthread r1, imm9 */
-{ "crei",       F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x6)|ASI_UT(~0),  "2,1", 0,       v8 }, /* crei r2, r1 */
-{ "cred",       F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x6),             "^,1", 0,       v8 }, /* cred imm9, r1 */
-
-{ "creba",      F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xE),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xE)|ASI_UT(~0),    "1,2", 0, v8 }, /* creba r1, r2 */
-{ "creba",      F3(2, 0x30, 1)|RD(0x14)|OP_UT(0xE),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0xE),               "1,^", 0, v8 }, /* creba r1, imm9 */
-{ "crebi",      F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xF),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xF)|ASI_UT(~0),    "1,2", 0, v8 }, /* crebi r1, r2 */
-{ "crebi",      F3(2, 0x30, 1)|RD(0x14)|OP_UT(0xF),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0xF),               "1,^", 0, v8 }, /* crebi r1, imm9 */
-
-{ "putg",       F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x7),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x7),  "2,1,>", 0, v8 }, /* putg r2, r1, imm4 */
-{ "puts",       F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x8),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x8),  "2,1,>", 0, v8 }, /* puts r2, r1, imm4 */
 { "gets",       F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xB), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xB), "2,>,d", 0, v8 }, /* gets r2, imm4, rd */
+{ "getg",       F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xC), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xC), "2,>,d", 0, v8 }, /* getg r2, imm4, rd */
+{ "fgets",      F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xD), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xD), "2,>,g", 0, v8 }, /* fgets r2, imm4, fd */
+{ "fgetg",      F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xE), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xE), "2,>,g", 0, v8 }, /* fgetg r2, imm4, fd */
+
+/* wrasr %asr19 equivalents */
+{ "creba",      F3(2, 0x30, 0)|RD(0x13)|OP_UT(0x3),  F3(~2, ~0x30, ~0)|RD(~0x13)|OP_UT(~0x3)|ASI_UT(~0),    "1,2", 0, v8 }, /* creba r1, r2 */
+{ "creba",      F3(2, 0x30, 1)|RD(0x13)|OP_UT(0x3),  F3(~2, ~0x30, ~1)|RD(~0x13)|OP_UT(~0x3),               "1,^", 0, v8 }, /* creba r1, imm9 */
+
+{ "crebi",      F3(2, 0x30, 0)|RD(0x13)|OP_UT(0x4),  F3(~2, ~0x30, ~0)|RD(~0x13)|OP_UT(~0x4)|ASI_UT(~0),    "1,2", 0, v8 }, /* crebi r1, r2 */
+{ "crebi",      F3(2, 0x30, 1)|RD(0x13)|OP_UT(0x4),  F3(~2, ~0x30, ~1)|RD(~0x13)|OP_UT(~0x4),               "1,^", 0, v8 }, /* crebi r1, imm9 */
+
+{ "print",      F3(2, 0x30, 0)|RD(0x13)|OP_UT(0xF),  F3(~2, ~0x30, ~0)|RD(~0x13)|OP_UT(~0xF)|ASI_UT(~0),    "1,2", 0, v8 }, /* print r1, r2 */
+{ "print",      F3(2, 0x30, 1)|RD(0x13)|OP_UT(0xF),  F3(~2, ~0x30, ~1)|RD(~0x13)|OP_UT(~0xF),		    "1,^", 0, v8 }, /* print r1, imm9 */
+
+/* wrasr %asr20 equivalents */
+{ "launch",     F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x1),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x1)|ASI_UT(~0),  "1", 0, v8 },   /* launch r1 */ /* UTLEON3 */
+
+{ "setstart",   F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x2),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x2)|ASI_UT(~0),  "1,2", 0, v8 }, /* setstart r1, r2 */ /* UTLEON3 */
+{ "setstart",   F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x2),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x2),             "1,^", 0, v8 }, /* setstart r1, imm9 */ /* UTLEON3 */
+
+{ "setlimit",   F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x3),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x3)|ASI_UT(~0),  "1,2", 0, v8 }, /* setlimit r1, r2 */ /* UTLEON3 */
+{ "setlimit",   F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x3),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x3),             "1,^", 0, v8 }, /* setlimit r1, imm9 */ /* UTLEON3 */
+
+{ "setstep",    F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x4),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x4)|ASI_UT(~0),  "1,2", 0, v8 }, /* setstep r1, r2 */ /* UTLEON3 */
+{ "setstep",    F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x4),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x4),             "1,^", 0, v8 }, /* setstep r1, imm9 */ /* UTLEON3 */
+
+{ "setblock",   F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x5),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x5)|ASI_UT(~0),  "1,2", 0, v8 }, /* setblock r1, r2 */ /* UTLEON3 */
+{ "setblock",   F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x5),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x5),             "1,^", 0, v8 }, /* setblock r1, imm9 */ /* UTLEON3 */
+
+{ "setthread",  F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x6)|ASI_UT(~0),  "1,2", F_ALIAS, v8 }, /* setthread r1, r2 */ /* UTLEON3 */
+{ "setthread",  F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x6),             "1,^", F_ALIAS, v8 }, /* setthread r1, imm9 */ /* UTLEON3 */
 
 { "detach",     F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x9),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x9)|ASI_UT(~0),  "1", F_ALIAS, v8 }, /* detach r1 */
 { "release",    F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x9),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x9),             "1", 0,       v8 }, /* release r1 */
 
-{ "break", 	    F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xA),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xA)|ASI_UT(~0),  "2", 0, v8 },   /* break r2 */
-{ "break", 		F3(2, 0x30, 1)|RD(0x14)|OP_UT(0xA),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0xA),             "^", 0, v8 },   /* break imm9 */
+{ "break", 	F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xA),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xA)|ASI_UT(~0),  "", 0, v8 },   /* break r2 */
+{ "break", 	F3(2, 0x30, 1)|RD(0x14)|OP_UT(0xA),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0xA),             "", 0, v8 },   /* break imm9 */
 
-{ "print",	    F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xB), F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xB)|ASI_UT(~0), "1,2", 0, v6 }, /* print r1, r2 */
-{ "print",	    F3(2, 0x30, 1)|RD(0x14)|OP_UT(0xB), F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0xB),		    "1,^", 0, v6 }, /* print r1, imm9 */
-
-{ "fputg",      F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xC),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xC),  "f,1,>", 0, v8 }, /* fputg f2, r1, imm4 */
+{ "puts",       F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xB),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xB),  "2,1,>", 0, v8 }, /* puts r2, r1, imm4 */
+{ "putg",       F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xC),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xC),  "2,1,>", 0, v8 }, /* putg r2, r1, imm4 */
 { "fputs",      F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xD),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xD),  "f,1,>", 0, v8 }, /* fputs f2, r1, imm4 */
-{ "fgets",      F3(2, 0x28, 0)|RS1(0x14)|OP_UT(0xC), F3(~2, ~0x28, ~0)|RS1(~0x14)|OP_UT(~0xC), "2,>,g", 0, v8 }, /* fgets r2, imm4, fd */
+{ "fputg",      F3(2, 0x30, 0)|RD(0x14)|OP_UT(0xE),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0xE),  "f,1,>", 0, v8 }, /* fputg f2, r1, imm4 */
 
+/* End Microthreaded instructions */
 
 { "rdpr",	F3(2, 0x2a, 0),		F3(~2, ~0x2a, ~0)|SIMM13(~0),	"?,d", 0, v9 },   /* rdpr %priv,r */
 { "wrpr",	F3(2, 0x32, 0),		F3(~2, ~0x32, ~0),		"1,2,!", 0, v9 }, /* wrpr r1,r2,%priv */
