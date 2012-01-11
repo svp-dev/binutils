@@ -517,6 +517,10 @@ const struct alpha_opcode mtalpha_opcodes[] =
 
   { "break",      OPR (0x01,0x08), BASE, { ZA, ZB,  ZC } },
 
+  { "print",      OPR (0x01,0x0F), BASE, { RA, RB,  ZC } },
+  { "print",      OPRL(0x01,0x0F), BASE, { RA, LIT, ZC } },
+  /* printf: FP version below. */
+
   { "setstart",   OPR (0x01,0x20), BASE, { RA, RB,  ZC } },
   { "setstart",   OPRL(0x01,0x20), BASE, { RA, LIT, ZC } },
   { "setlimit",   OPR (0x01,0x21), BASE, { RA, RB,  ZC } },
@@ -525,20 +529,21 @@ const struct alpha_opcode mtalpha_opcodes[] =
   { "setstep",    OPRL(0x01,0x22), BASE, { RA, LIT, ZC } },
   { "setblock",   OPR (0x01,0x23), BASE, { RA, RB,  ZC } },
   { "setblock",   OPRL(0x01,0x23), BASE, { RA, LIT, ZC } },
+
   { "putg",       OPR (0x01,0x24), BASE, { RB, RA,  IDXC} },
   { "putg",       OPRL(0x01,0x24), BASE, { LIT, RA, IDXC} },
-  { "fputg",      FP (0x05,0x024), BASE, { FB, RA,  IDXC} },
+  /* fputg: FP version below. */
   { "puts",       OPR (0x01,0x25), BASE, { RB,  RA, IDXC} },
   { "puts",       OPRL(0x01,0x25), BASE, { LIT, RA, IDXC} },
-  { "fputs",      FP (0x05,0x025), BASE, { FB, RA,  IDXC} },
+  /* fputs: FP version below. */
   { "release",    OPR (0x01,0x28), BASE, { RA, ZB,  ZC } },
   { "detach",     OPR (0x01,0x28), BASE, { RA, ZB,  ZC } }, /* alias */
 
   { "sync",       OPR (0x01,0x30), BASE, { RA, ZB,   RC } },
   { "getg",       OPR (0x01,0x32), BASE, { RA, IDXB, RC } },
-  { "fgetg",      FP (0x05,0x032), BASE, { RA, IDXB, FC } },
+  /* fgetg: FP version below. */
   { "gets",       OPR (0x01,0x33), BASE, { RA, IDXB, RC } },
-  { "fgets",      FP (0x05,0x033), BASE, { RA, IDXB, FC } },
+  /* fgets: FP version below. */
 
   { "allocate",   OPR (0x01,0x40), BASE, { RA, RB,  RC } },
   { "allocate",   OPRL(0x01,0x40), BASE, { RA, LIT, RC } },
@@ -559,10 +564,11 @@ const struct alpha_opcode mtalpha_opcodes[] =
   { "crei",       MEM (0x03),      BASE, ARG_MEM },
   { "cred",       BRA (0x04),      BASE, ARG_BRA },
                   
-                  
-  { "print",      OPR (0x01,0x0F), BASE, { RA, RB,  ZC } },
-  { "print",      OPRL(0x01,0x0F), BASE, { RA, LIT, ZC } },
   { "printf",     FP (0x05,0x00F), BASE, { FB, RA,  ZC } },
+  { "fputg",      FP (0x05,0x024), BASE, { FB, RA,  IDXC} },
+  { "fputs",      FP (0x05,0x025), BASE, { FB, RA,  IDXC} },
+  { "fgetg",      FP (0x05,0x032), BASE, { RA, IDXB, FC } },
+  { "fgets",      FP (0x05,0x033), BASE, { RA, IDXB, FC } },
 
 /* * */
 
