@@ -2361,22 +2361,22 @@ sparc_ip (str, pinsn)
                     break;
 
                   case 'l':
-                    base = 1;
+                    base = 0;
                     count = register_counts.flts.local;
                     break;
                     
                   case 'g':
-                    base = 1+register_counts.flts.local;
+                    base = 0+register_counts.flts.local;
                     count = register_counts.flts.global;
                     break;
                     
                   case 's':
-                    base = 1+register_counts.flts.local + register_counts.flts.global;
+                    base = 0+register_counts.flts.local + register_counts.flts.global;
                     count = register_counts.flts.shared;
                     break;
                     
                   case 'd':
-                    base = 1+register_counts.flts.global + register_counts.flts.shared + register_counts.flts.local;
+                    base = 0+register_counts.flts.global + register_counts.flts.shared + register_counts.flts.local;
                     count = register_counts.flts.shared;
                     break;
                     
@@ -3999,7 +3999,7 @@ s_registers(ignore)
   for (i = 0; i < 6; i++)
     {
       *args[i] = get_absolute_expression ();
-      if (*args[i] > 31)
+      if (i < 3 && *args[i] > 31) /* FP can have 32 regs */
         {
           as_bad(_("invalid .registers argument"));
           return;
@@ -4010,7 +4010,7 @@ s_registers(ignore)
 
   /* Validate arguments */
   if (counts.ints.global + 2 * counts.ints.shared + counts.ints.local > 31 ||
-      counts.flts.global + 2 * counts.flts.shared + counts.flts.local > 31)
+      counts.flts.global + 2 * counts.flts.shared + counts.flts.local > 32)
     {
       as_bad(_("invalid .registers arguments"));
       return;
