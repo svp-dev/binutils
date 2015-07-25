@@ -2357,7 +2357,7 @@ sparc_ip (str, pinsn)
                   {
                   case 'f':
                     base = 0;
-                    count = 31;
+                    count = 32;
                     break;
 
                   case 'l':
