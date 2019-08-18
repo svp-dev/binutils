@@ -945,6 +945,9 @@ const struct sparc_opcode sparc_opcodes[] = {
 { "setthread",  F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x6)|ASI_UT(~0),  "1,2", F_ALIAS, v8 }, /* setthread r1, r2 */ /* UTLEON3 */
 { "setthread",  F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x6),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x6),             "1,^", F_ALIAS, v8 }, /* setthread r1, imm9 */ /* UTLEON3 */
 
+{ "setarg",  F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x7),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x7)|ASI_UT(~0),  "1,2", F_ALIAS, v8 }, /* setarg r1, r2 */ /* UTLEON3 */
+{ "setarg",  F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x7),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x7),             "1,^", F_ALIAS, v8 }, /* setarg r1, imm9 */ /* UTLEON3 */
+
 { "detach",     F3(2, 0x30, 0)|RD(0x14)|OP_UT(0x9),  F3(~2, ~0x30, ~0)|RD(~0x14)|OP_UT(~0x9)|ASI_UT(~0),  "1", F_ALIAS, v8 }, /* detach r1 */
 { "release",    F3(2, 0x30, 1)|RD(0x14)|OP_UT(0x9),  F3(~2, ~0x30, ~1)|RD(~0x14)|OP_UT(~0x9),             "1", 0,       v8 }, /* release r1 */
 
